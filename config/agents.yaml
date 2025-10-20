@@ -1,0 +1,34 @@
+# Agent configuration settings
+
+profiler:
+  # Performance settings
+  parallel_processing: true
+  max_workers: 4
+  
+  # Chunked processing for large datasets
+  enable_chunked_processing: true
+  chunk_size: 50000
+  chunked_processing_threshold_mb: 1000  # Enable chunked processing for files > 1GB
+  
+  # Sampling for large datasets (disabled for full dataset profiling)
+  enable_sampling: false
+  sample_size: 100000
+  
+  # Memory management
+  optimize_dtypes: true
+  
+  # Progress tracking
+  enable_progress_tracking: true
+  persist_results: true
+  
+  # Output settings
+  max_violation_examples: 10
+
+anomaly_detection:
+  min_history_points: 3
+  max_history_points: 50
+  zscore_threshold: 2.5
+  delta_thresholds:
+    completeness: 10.0
+    uniqueness: 5.0
+    conformity: 5.0
