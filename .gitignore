@@ -211,3 +211,4 @@ npidata.csv
 results/
 
 .DS_Store
+*.log

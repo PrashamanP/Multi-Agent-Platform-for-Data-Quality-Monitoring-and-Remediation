@@ -126,77 +126,7 @@ class ValidationRule:
     rule_config: Dict[str, Any]
     description: str
     
-    def validate_value(self, value: Any) -> bool:
-        """Validate a single value against this rule."""
-        # Use the new null detection logic
-        if is_value_null_for_completeness(value, self.column_name):
-            return False
-            
-        str_value = str(value).strip()
-        
-        if self.rule_type == "regex":
-            import re
-            pattern = self.rule_config.get("pattern", "")
-            return bool(re.match(pattern, str_value))
-        
-        elif self.rule_type == "enum":
-            allowed_values = self.rule_config.get("values", [])
-            # Handle float-to-string conversion for numeric enum values
-            if self.column_name == "Entity Type Code":
-                # Convert "1.0" -> "1", "2.0" -> "2" 
-                try:
-                    float_val = float(str_value)
-                    if float_val.is_integer():
-                        normalized_value = str(int(float_val))
-                        return normalized_value in allowed_values
-                except ValueError:
-                    pass
-            return str_value in allowed_values
-        
-        elif self.rule_type == "length":
-            min_len = self.rule_config.get("min", 0)
-            max_len = self.rule_config.get("max", float('inf'))
-            return min_len <= len(str_value) <= max_len
-        
-        elif self.rule_type == "numeric":
-            try:
-                float(str_value)
-                return True
-            except ValueError:
-                return False
-        
-        elif self.rule_type == "date":
-            from datetime import datetime
-            try:
-                # Try multiple date formats to handle MM/dd/yyyy and YYYY-MM-DD
-                date_formats = ["%m/%d/%Y", "%Y-%m-%d", "%m-%d-%Y", "%Y/%m/%d"]
-                parsed_date = None
-                
-                for fmt in date_formats:
-                    try:
-                        parsed_date = datetime.strptime(str_value, fmt)
-                        break
-                    except ValueError:
-                        continue
-                
-                if parsed_date is None:
-                    return False
-                    
-                if self.rule_config.get("not_future", False):
-                    return parsed_date.date() <= datetime.now().date()
-                return True
-            except ValueError:
-                return False
-        
-        elif self.rule_type == "phone":
-            import re
-            # Remove all non-digits
-            digits_only = re.sub(r'\D', '', str_value)
-            min_digits = self.rule_config.get("min_digits", 7)
-            max_digits = self.rule_config.get("max_digits", 20)
-            return min_digits <= len(digits_only) <= max_digits
-        
-        return False
+    # Validation logic has been moved to ValidatorAgent for better separation of concerns
 
 
 @dataclass

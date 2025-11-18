@@ -51,6 +51,85 @@ def print_profile_summary(profile_results):
     print(f"\nISSUES DETECTED: {len(profile_results.issues)} total")
 
 
+def print_detailed_column_statistics(profile_results):
+    """Print detailed statistics table for each column with completeness, conformity, and uniqueness scores."""
+    import yaml
+    from pathlib import Path
+    
+    profile = profile_results.dataset_profile
+    
+    print(f"\nDETAILED COLUMN STATISTICS")
+    print("=" * 120)
+    
+    # Load focused columns from config
+    try:
+        config_path = Path(__file__).parent.parent / "config" / "columns.yaml"
+        with open(config_path, 'r') as f:
+            config = yaml.safe_load(f)
+        focused_columns = config.get('focused_columns', [])
+    except Exception as e:
+        print(f"Warning: Could not load focused columns config: {str(e)}")
+        focused_columns = None
+    
+    # Determine which columns to display
+    if focused_columns:
+        # Filter to only focused columns that exist in the profile
+        columns_to_display = [
+            (col_name, profile.column_metrics[col_name]) 
+            for col_name in focused_columns 
+            if col_name in profile.column_metrics
+        ]
+        # Sort focused columns by overall quality (worst first) for better visibility
+        columns_to_display.sort(key=lambda x: (x[1].conformity_score + x[1].completeness_score) / 2)
+    else:
+        # Fallback: display all columns sorted by quality
+        columns_to_display = sorted(
+            profile.column_metrics.items(),
+            key=lambda x: (x[1].conformity_score + x[1].completeness_score) / 2
+        )
+    
+    # Print table header
+    print(f"{'Column Name':<45} {'Completeness':<13} {'Conformity':<12} {'Uniqueness':<12} {'Issues'}")
+    print("-" * 120)
+    
+    for col_name, metrics in columns_to_display:
+        # Format column name (truncate if too long)
+        col_display = col_name[:42] + "..." if len(col_name) > 45 else col_name
+        
+        # Format completeness
+        completeness_str = f"{metrics.completeness_score:.1f}%"
+        
+        # Format conformity
+        conformity_str = f"{metrics.conformity_score:.1f}%"
+        
+        # Format uniqueness (handle None case)
+        if metrics.uniqueness_score is not None:
+            uniqueness_str = f"{metrics.uniqueness_score:.1f}%"
+        else:
+            uniqueness_str = "N/A"
+        
+        # Format issues summary
+        issues = []
+        if metrics.null_count > 0:
+            issues.append(f"{metrics.null_count:,} nulls")
+        if metrics.non_conforming_count > 0:
+            issues.append(f"{metrics.non_conforming_count:,} invalid")
+        if metrics.duplicate_count and metrics.duplicate_count > 0:
+            issues.append(f"{metrics.duplicate_count:,} dups")
+        
+        issues_str = ", ".join(issues) if issues else "None"
+        if len(issues_str) > 55:
+            issues_str = issues_str[:52] + "..."
+        
+        print(f"{col_display:<45} {completeness_str:>10}   {conformity_str:>9}   {uniqueness_str:>9}   {issues_str}")
+    
+    print(f"\nTotal columns displayed: {len(columns_to_display)}")
+    if focused_columns:
+        missing_columns = [col for col in focused_columns if col not in profile.column_metrics]
+        if missing_columns:
+            print(f"Note: {len(missing_columns)} focused columns not found in dataset")
+
+
 def export_column_details_to_csv(profile_results, output_path):
     """Export detailed column metrics to CSV file for all focused columns."""
     import csv
@@ -200,6 +279,9 @@ def main():
         
         # Print results
         print_profile_summary(results)
+        
+        # Print detailed column statistics table
+        print_detailed_column_statistics(results)
         
         # Export column details to CSV
         results_dir = Path("data/results")
