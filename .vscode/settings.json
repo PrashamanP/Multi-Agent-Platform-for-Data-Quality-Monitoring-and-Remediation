@@ -1,0 +1,19 @@
+{
+  // Rainbow CSV settings for column coloring
+  "rainbow_csv.enabled": true,
+  "rainbow_csv.show_separator_lines": true,
+  "rainbow_csv.separator_policy": "auto",
+  "rainbow_csv.quoting_policy": "auto",
+  
+  // Enable column alignment (helps visualize columns)
+  "rainbow_csv.align_columns": true,
+  
+  // File associations for CSV files
+  "files.associations": {
+    "*.csv": "rainbow-csv"
+  },
+  
+  // Optional: Use Excel Viewer for better table visualization
+  "excelViewer.enabled": true
+}
+

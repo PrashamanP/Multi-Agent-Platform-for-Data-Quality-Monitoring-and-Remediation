@@ -1,0 +1,370 @@
+# NPI Dataset Validation Rules Configuration
+# This file defines validation rules for NPI dataset columns
+
+# Rule definitions organized by column name
+rules:
+  # Core Identity Rules
+  NPI:
+    rule_id: "NPI_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^\\d{10}$"
+    description: "NPI must be exactly 10 digits, all numeric"
+
+  "Entity Type Code":
+    rule_id: "ENTITY_TYPE_FORMAT"
+    rule_type: "enum"
+    rule_config:
+      values: ["1", "2"]
+    description: "Entity Type Code must be either '1' or '2'"
+
+  "Employer Identification Number (EIN)":
+    rule_id: "EIN_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^(\\d{9}|<UNAVAIL>)$"
+    description: "EIN must be 9 digits numeric or '<UNAVAIL>'"
+
+  # Provider Organization Name
+  "Provider Organization Name (Legal Business Name)":
+    rule_id: "ORG_NAME_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 2
+      max: 120
+    description: "Provider Organization Name must be 2-120 characters"
+
+  # Provider Name Rules
+  "Provider Last Name (Legal Name)":
+    rule_id: "PROVIDER_LAST_NAME_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Za-z\\s\\-\\'\\.]{1,100}$"
+    description: "Provider Last Name (Legal Name) must be alphabetic with optional punctuation, max 100 characters"
+
+  "Provider First Name":
+    rule_id: "PROVIDER_FIRST_NAME_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Za-z\\s\\-\\'\\.]{1,100}$"
+    description: "Provider First Name must be alphabetic with optional punctuation, max 100 characters"
+
+  # Address Rules
+  "Provider First Line Business Mailing Address":
+    rule_id: "PROVIDER_FIRST_LINE_BUSINESS_MAILING_ADDRESS_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 80
+    description: "Provider First Line Business Mailing Address must be 1-80 characters"
+
+  "Provider Second Line Business Mailing Address":
+    rule_id: "PROVIDER_SECOND_LINE_BUSINESS_MAILING_ADDRESS_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 80
+    description: "Provider Second Line Business Mailing Address must be 1-80 characters"
+
+  "Provider First Line Business Practice Location Address":
+    rule_id: "PROVIDER_FIRST_LINE_BUSINESS_PRACTICE_LOCATION_ADDRESS_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 80
+    description: "Provider First Line Business Practice Location Address must be 1-80 characters"
+
+  "Provider Second Line Business Practice Location Address":
+    rule_id: "PROVIDER_SECOND_LINE_BUSINESS_PRACTICE_LOCATION_ADDRESS_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 80
+    description: "Provider Second Line Business Practice Location Address must be 1-80 characters"
+
+  # City Name Rules
+  "Provider Business Mailing Address City Name":
+    rule_id: "PROVIDER_BUSINESS_MAILING_ADDRESS_CITY_NAME_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Za-z\\s\\-\\'\\.]{1,40}$"
+    description: "Provider Business Mailing Address City Name must be alphabetic with spaces or punctuation, 1-40 characters"
+
+  "Provider Business Practice Location Address City Name":
+    rule_id: "PROVIDER_BUSINESS_PRACTICE_LOCATION_ADDRESS_CITY_NAME_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Za-z\\s\\-\\'\\.]{1,40}$"
+    description: "Provider Business Practice Location Address City Name must be alphabetic with spaces or punctuation, 1-40 characters"
+
+  # Country Code Rules
+  "Provider Business Mailing Address Country Code (If outside U.S.)":
+    rule_id: "PROVIDER_BUSINESS_MAILING_ADDRESS_COUNTRY_CODE_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Z]{2}$"
+    description: "Provider Business Mailing Address Country Code (If outside U.S.) must be exactly 2 uppercase letters"
+
+  "Provider Business Practice Location Address Country Code (If outside U.S.)":
+    rule_id: "PROVIDER_BUSINESS_PRACTICE_LOCATION_ADDRESS_COUNTRY_CODE_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Z]{2}$"
+    description: "Provider Business Practice Location Address Country Code (If outside U.S.) must be exactly 2 uppercase letters"
+
+  # State Code Rules
+  "Provider Business Mailing Address State Name":
+    rule_id: "PROVIDER_BUSINESS_MAILING_ADDRESS_STATE_NAME_FORMAT"
+    rule_type: "enum"
+    rule_config:
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Provider Business Mailing Address State Name must be valid USPS state/territory code (including military codes AE, AP, AA)"
+
+  "Provider Business Practice Location Address State Name":
+    rule_id: "PROVIDER_BUSINESS_PRACTICE_LOCATION_ADDRESS_STATE_NAME_FORMAT"
+    rule_type: "enum"
+    rule_config:
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Provider Business Practice Location Address State Name must be valid USPS state/territory code (including military codes AE, AP, AA)"
+
+  "Provider License Number State Code_1":
+    rule_id: "PROVIDER_LICENSE_NUMBER_STATE_CODE_1_FORMAT"
+    rule_type: "enum"
+    rule_config:
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Provider License Number State Code_1 must be valid USPS state/territory code (including military codes AE, AP, AA)"
+
+  "Provider License Number State Code_2":
+    rule_id: "PROVIDER_LICENSE_NUMBER_STATE_CODE_2_FORMAT"
+    rule_type: "enum"
+    rule_config:
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Provider License Number State Code_2 must be valid USPS state/territory code (including military codes AE, AP, AA)"
+
+  # Postal Code Rules
+  "Provider Business Mailing Address Postal Code":
+    rule_id: "PROVIDER_BUSINESS_MAILING_ADDRESS_POSTAL_CODE_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^(\\d{5}(-\\d{4})?(\\.0)?|\\d{9}(\\.0)?)$"
+    description: "Provider Business Mailing Address Postal Code must be 5 digits (12345 or 12345.0), ZIP+4 format (12345-6789), or 9-digit format (123456789.0)"
+
+  "Provider Business Practice Location Address Postal Code":
+    rule_id: "PROVIDER_BUSINESS_PRACTICE_LOCATION_ADDRESS_POSTAL_CODE_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^(\\d{5}(-\\d{4})?(\\.0)?|\\d{9}(\\.0)?)$"
+    description: "Provider Business Practice Location Address Postal Code must be 5 digits (12345 or 12345.0), ZIP+4 format (12345-6789), or 9-digit format (123456789.0)"
+
+  # Phone Number Rules
+  "Provider Business Mailing Address Telephone Number":
+    rule_id: "PROVIDER_BUSINESS_MAILING_ADDRESS_TELEPHONE_NUMBER_FORMAT"
+    rule_type: "phone"
+    rule_config:
+      min_digits: 7
+      max_digits: 20
+    description: "Provider Business Mailing Address Telephone Number must be 7-20 digits after removing punctuation"
+
+  "Provider Business Practice Location Address Telephone Number":
+    rule_id: "PROVIDER_BUSINESS_PRACTICE_LOCATION_ADDRESS_TELEPHONE_NUMBER_FORMAT"
+    rule_type: "phone"
+    rule_config:
+      min_digits: 7
+      max_digits: 20
+    description: "Provider Business Practice Location Address Telephone Number must be 7-20 digits after removing punctuation"
+
+  # Fax Number Rules
+  "Provider Business Mailing Address Fax Number":
+    rule_id: "PROVIDER_BUSINESS_MAILING_ADDRESS_FAX_NUMBER_FORMAT"
+    rule_type: "phone"
+    rule_config:
+      min_digits: 7
+      max_digits: 20
+    description: "Provider Business Mailing Address Fax Number must be 7-20 digits after removing punctuation"
+
+  "Provider Business Practice Location Address Fax Number":
+    rule_id: "PROVIDER_BUSINESS_PRACTICE_LOCATION_ADDRESS_FAX_NUMBER_FORMAT"
+    rule_type: "phone"
+    rule_config:
+      min_digits: 7
+      max_digits: 20
+    description: "Provider Business Practice Location Address Fax Number must be 7-20 digits after removing punctuation"
+
+  # Date Rules
+  "Provider Enumeration Date":
+    rule_id: "PROVIDER_ENUMERATION_DATE_FORMAT"
+    rule_type: "date"
+    rule_config:
+      not_future: true
+    description: "Provider Enumeration Date must be a valid calendar date, not in the future"
+
+  "Last Update Date":
+    rule_id: "LAST_UPDATE_DATE_FORMAT"
+    rule_type: "date"
+    rule_config:
+      not_future: true
+    description: "Last Update Date must be a valid calendar date, not in the future"
+
+  "Certification Date":
+    rule_id: "CERTIFICATION_DATE_FORMAT"
+    rule_type: "date"
+    rule_config:
+      not_future: true
+    description: "Certification Date must be a valid calendar date, not in the future"
+
+  # Healthcare Provider Taxonomy Code Rules
+  "Healthcare Provider Taxonomy Code_1":
+    rule_id: "HEALTHCARE_PROVIDER_TAXONOMY_CODE_1_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Za-z0-9]{10}$"
+    description: "Healthcare Provider Taxonomy Code_1 must be 10-character alphanumeric code"
+
+  "Healthcare Provider Taxonomy Code_2":
+    rule_id: "HEALTHCARE_PROVIDER_TAXONOMY_CODE_2_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Za-z0-9]{10}$"
+    description: "Healthcare Provider Taxonomy Code_2 must be 10-character alphanumeric code"
+
+  # License Number Rules
+  "Provider License Number_1":
+    rule_id: "PROVIDER_LICENSE_NUMBER_1_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Za-z0-9]{1,25}$"
+    description: "Provider License Number_1 must be 1-25 characters, letters/numbers allowed"
+
+  "Provider License Number_2":
+    rule_id: "PROVIDER_LICENSE_NUMBER_2_FORMAT"
+    rule_type: "regex"
+    rule_config:
+      pattern: "^[A-Za-z0-9]{1,25}$"
+    description: "Provider License Number_2 must be 1-25 characters, letters/numbers allowed"
+
+  # Primary Taxonomy Switch Rules
+  "Healthcare Provider Primary Taxonomy Switch_1":
+    rule_id: "HEALTHCARE_PROVIDER_PRIMARY_TAXONOMY_SWITCH_1_FORMAT"
+    rule_type: "enum"
+    rule_config:
+      values: ["Y", "N"]
+    description: "Healthcare Provider Primary Taxonomy Switch_1 must be 'Y' or 'N'"
+
+  "Healthcare Provider Primary Taxonomy Switch_2":
+    rule_id: "HEALTHCARE_PROVIDER_PRIMARY_TAXONOMY_SWITCH_2_FORMAT"
+    rule_type: "enum"
+    rule_config:
+      values: ["Y", "N"]
+    description: "Healthcare Provider Primary Taxonomy Switch_2 must be 'Y' or 'N'"
+
+  # Taxonomy Group Rules
+  "Healthcare Provider Taxonomy Group_1":
+    rule_id: "HEALTHCARE_PROVIDER_TAXONOMY_GROUP_1_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 50
+    description: "Healthcare Provider Taxonomy Group_1 must be 1-50 characters"
+
+  "Healthcare Provider Taxonomy Group_2":
+    rule_id: "HEALTHCARE_PROVIDER_TAXONOMY_GROUP_2_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 50
+    description: "Healthcare Provider Taxonomy Group_2 must be 1-50 characters"
+
+  # Other Provider Identifier Rules
+  "Other Provider Identifier_1":
+    rule_id: "OTHER_PROVIDER_IDENTIFIER_1_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 100
+    description: "Other Provider Identifier_1 must be 1-50 characters"
+
+  "Other Provider Identifier_2":
+    rule_id: "OTHER_PROVIDER_IDENTIFIER_2_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 100
+    description: "Other Provider Identifier_2 must be 1-50 characters"
+
+  # Other Provider Identifier Type Code Rules
+  "Other Provider Identifier Type Code_1":
+    rule_id: "OTHER_PROVIDER_IDENTIFIER_TYPE_CODE_1_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 10
+    description: "Other Provider Identifier Type Code_1 must be 1-10 characters"
+
+  "Other Provider Identifier Type Code_2":
+    rule_id: "OTHER_PROVIDER_IDENTIFIER_TYPE_CODE_2_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 10
+    description: "Other Provider Identifier Type Code_2 must be 1-10 characters"
+
+  # Other Provider Identifier State Rules
+  "Other Provider Identifier State_1":
+    rule_id: "OTHER_PROVIDER_IDENTIFIER_STATE_1_FORMAT"
+    rule_type: "enum"
+    rule_config:
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Other Provider Identifier State_1 must be valid USPS state/territory code (including military codes AE, AP, AA)"
+
+  "Other Provider Identifier State_2":
+    rule_id: "OTHER_PROVIDER_IDENTIFIER_STATE_2_FORMAT"
+    rule_type: "enum"
+    rule_config:
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Other Provider Identifier State_2 must be valid USPS state/territory code (including military codes AE, AP, AA)"
+
+  # Other Provider Identifier Issuer Rules
+  "Other Provider Identifier Issuer_1":
+    rule_id: "OTHER_PROVIDER_IDENTIFIER_ISSUER_1_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 100
+    description: "Other Provider Identifier Issuer_1 must be 1-50 characters"
+
+  "Other Provider Identifier Issuer_2":
+    rule_id: "OTHER_PROVIDER_IDENTIFIER_ISSUER_2_FORMAT"
+    rule_type: "length"
+    rule_config:
+      min: 1
+      max: 100
+    description: "Other Provider Identifier Issuer_2 must be 1-50 characters"
+
+# Field categorization for completeness analysis
+field_categories:
+  critical_fields:
+    - "NPI"
+    - "Entity Type Code"
+    - "Provider Organization Name (Legal Business Name)"
+    - "Provider Last Name (Legal Name)"
+    - "Provider First Name"
+
+  universal_required_fields:
+    - "NPI"
+    - "Entity Type Code"
+    - "Provider Enumeration Date"
+    - "Last Update Date"
+
+  conditional_required_fields:
+    "1":  # Individual (Entity Type Code = 1)
+      required:
+        - "Provider Last Name (Legal Name)"
+        - "Provider First Name"
+      optional:
+        - "Provider Organization Name (Legal Business Name)"
+    "2":  # Organization (Entity Type Code = 2)
+      required:
+        - "Provider Organization Name (Legal Business Name)"
+      optional:
+        - "Provider Last Name (Legal Name)"
+        - "Provider First Name"

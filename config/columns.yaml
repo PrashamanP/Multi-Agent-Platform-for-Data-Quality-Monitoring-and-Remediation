@@ -1,0 +1,61 @@
+# NPI Dataset - Focused Column Configuration
+# This file defines the specific columns we want to analyze for data quality metrics
+
+# Core columns to focus on for completeness, uniqueness, and conformity analysis
+focused_columns:
+  # Core Identity
+  - "NPI"
+  - "Entity Type Code"
+  - "Employer Identification Number (EIN)"
+  
+  # Provider Names
+  - "Provider Last Name (Legal Name)"
+  - "Provider Organization Name (Legal Business Name)"
+  - "Provider First Name"
+  
+  # Mailing Address
+  - "Provider First Line Business Mailing Address"
+  - "Provider Second Line Business Mailing Address"
+  - "Provider Business Mailing Address City Name"
+  - "Provider Business Mailing Address State Name"
+  - "Provider Business Mailing Address Postal Code"
+  - "Provider Business Mailing Address Country Code (If outside U.S.)"
+  - "Provider Business Mailing Address Telephone Number"
+  - "Provider Business Mailing Address Fax Number"
+  
+  # Practice Location Address
+  - "Provider First Line Business Practice Location Address"
+  - "Provider Second Line Business Practice Location Address"
+  - "Provider Business Practice Location Address City Name"
+  - "Provider Business Practice Location Address State Name"
+  - "Provider Business Practice Location Address Postal Code"
+  - "Provider Business Practice Location Address Country Code (If outside U.S.)"
+  - "Provider Business Practice Location Address Telephone Number"
+  - "Provider Business Practice Location Address Fax Number"
+  
+  # Dates
+  - "Provider Enumeration Date"
+  - "Last Update Date"
+  
+  # Healthcare Provider Taxonomy
+  - "Healthcare Provider Taxonomy Code_1"
+  - "Provider License Number_1"
+  - "Provider License Number State Code_1"
+  - "Healthcare Provider Primary Taxonomy Switch_1"
+  - "Healthcare Provider Taxonomy Code_2"
+  - "Provider License Number_2"
+  - "Provider License Number State Code_2"
+  - "Healthcare Provider Primary Taxonomy Switch_2"
+  - "Healthcare Provider Taxonomy Group_1"
+  - "Healthcare Provider Taxonomy Group_2"
+  
+  # Additional Identifiers
+  - "Certification Date"
+  - "Other Provider Identifier_1"
+  - "Other Provider Identifier Type Code_1"
+  - "Other Provider Identifier State_1"
+  - "Other Provider Identifier Issuer_1"
+  - "Other Provider Identifier_2"
+  - "Other Provider Identifier Type Code_2"
+  - "Other Provider Identifier State_2"
+  - "Other Provider Identifier Issuer_2"
