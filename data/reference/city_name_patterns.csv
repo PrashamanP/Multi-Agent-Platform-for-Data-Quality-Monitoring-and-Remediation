@@ -1,0 +1,7 @@
+original_city_name,fixed_city_name,state,description
+"WASHINGTON WASHINGTON, DC","WASHINGTON, DC",DC,"Duplicate city name - consecutive duplicate word removed"
+"NEW YORK YORK, NY","NEW YORK, NY",NY,"Duplicate word in multi-word city name removed"
+"CHICAGO CHICAGO","CHICAGO",IL,"Simple duplicate city name removed"
+"LOS ANGELES LOS ANGELES, CA","LOS ANGELES, CA",CA,"Multi-word duplicate city name removed"
+"BOSTON BOSTON BOSTON, MA","BOSTON, MA",MA,"Multiple consecutive duplicates removed"
+"SAN FRANCISCO SAN FRANCISCO, CA","SAN FRANCISCO, CA",CA,"Duplicate multi-word city name removed"

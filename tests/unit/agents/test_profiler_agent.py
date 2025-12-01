@@ -15,6 +15,7 @@ from pathlib import Path
 from src.agents.profiler_agent import ProfilerAgent
 from src.core.data_models import ValidationRule, ProfileResults
 from src.core.validation_rule_loader import ValidationRuleLoader
+from src.data_access.file_handler import FileHandler
 
 
 class TestProfilerAgent:
@@ -31,35 +32,35 @@ class TestProfilerAgent:
                 None,          # Null
                 '12345678ab'   # Invalid - contains letters
             ],
-            'Entity_Type_Code': [
+            'Entity Type Code': [
                 '1',           # Valid
                 '2',           # Valid
                 '3',           # Invalid
                 None,          # Null
                 '1'            # Valid
             ],
-            'Provider_Organization_Name': [
+            'Provider Organization Name (Legal Business Name)': [
                 'ABC Medical Center',      # Valid
                 'XYZ Healthcare',          # Valid
                 None,                      # Null
                 'A',                       # Invalid - too short
                 'Valid Organization Name'   # Valid
             ],
-            'Provider_Last_Name': [
+            'Provider Last Name (Legal Name)': [
                 'Smith',       # Valid
                 "O'Connor",    # Valid with apostrophe
                 'Smith123',    # Invalid - contains numbers
                 None,          # Null
                 'Johnson'      # Valid
             ],
-            'Provider_Enumeration_Date': [
+            'Provider Enumeration Date': [
                 '2020-01-15',  # Valid
                 '2021-06-30',  # Valid
                 '2025-12-01',  # Invalid - future date
                 None,          # Null
                 '2019-03-22'   # Valid
             ],
-            'Provider_Sex_Code': [
+            'Provider Sex Code': [
                 'M',           # Valid
                 'F',           # Valid
                 'X',           # Invalid
@@ -138,7 +139,7 @@ class TestProfilerAgent:
     
     def test_init_missing_validation_rules(self):
         """Test ProfilerAgent initialization when validation rules fail to load."""
-        with patch('src.core.validation_rule_loader.ValidationRuleLoader') as mock_loader:
+        with patch('src.agents.profiler_agent.ValidationRuleLoader') as mock_loader:
             mock_loader_instance = MagicMock()
             mock_loader_instance.load_validation_rules.return_value = {}
             mock_loader.return_value = mock_loader_instance
@@ -147,40 +148,38 @@ class TestProfilerAgent:
             assert agent.validation_rules == {}
             assert len(agent.universal_required_fields) > 0  # Should still have defaults
     
-    def test_load_dataset_success(self, profiler_agent, temp_csv_file):
-        """Test successful dataset loading."""
-        df = profiler_agent._load_dataset(temp_csv_file)
+    def test_load_dataset_success(self, profiler_agent, sample_npi_data, temp_csv_file):
+        """Test standard execution uses FileHandler to load dataset."""
+        with patch('src.data_access.file_handler.FileHandler.load_dataset', return_value=sample_npi_data) as mock_load:
+            results = profiler_agent._execute_standard(temp_csv_file)
         
-        assert isinstance(df, pd.DataFrame)
-        assert len(df) == 5
-        assert 'NPI' in df.columns
-        assert 'Entity_Type_Code' in df.columns
+        assert mock_load.call_count == 1
+        assert results.dataset_profile.total_rows == len(sample_npi_data)
+        assert 'NPI' in results.dataset_profile.column_metrics
     
     def test_load_dataset_file_not_found(self, profiler_agent):
-        """Test loading non-existent dataset file."""
-        with pytest.raises(FileNotFoundError):
-            profiler_agent._load_dataset('/path/that/does/not/exist.csv')
+        """Test standard execution propagates FileNotFoundError."""
+        with patch('src.data_access.file_handler.FileHandler.load_dataset', side_effect=FileNotFoundError("missing")):
+            with pytest.raises(FileNotFoundError):
+                profiler_agent._execute_standard('/path/that/does/not/exist.csv')
     
-    def test_load_dataset_encoding_fallback(self, profiler_agent, sample_npi_data):
-        """Test dataset loading with encoding fallback."""
-        # Create file with problematic encoding
+    def test_load_dataset_encoding_fallback(self, sample_npi_data):
+        """Test dataset loading with encoding fallback via FileHandler."""
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False, encoding='latin1') as f:
             sample_npi_data.to_csv(f.name, index=False)
             temp_file = f.name
         
         try:
-            with patch('pandas.read_csv') as mock_read_csv:
-                # First call raises UnicodeDecodeError, second succeeds
+            with patch('src.data_access.file_handler.pd.read_csv') as mock_read_csv:
                 mock_read_csv.side_effect = [
                     UnicodeDecodeError('utf-8', b'', 0, 1, 'invalid start byte'),
                     sample_npi_data
                 ]
                 
-                df = profiler_agent._load_dataset(temp_file)
+                df = FileHandler.load_dataset(temp_file, focused_columns_only=False)
                 
                 assert isinstance(df, pd.DataFrame)
                 assert mock_read_csv.call_count == 2
-                # First call with utf-8, second with latin1
                 assert mock_read_csv.call_args_list[1][1]['encoding'] == 'latin1'
         finally:
             os.unlink(temp_file)
@@ -203,39 +202,39 @@ class TestProfilerAgent:
     def test_profile_column_completeness_conditional_individual(self, profiler_agent):
         """Test column completeness calculation for conditional fields (Individual)."""
         df = pd.DataFrame({
-            'Entity_Type_Code': ['1', '1', '1', '1', '1'],
-            'Provider_Last_Name': ['Smith', 'Jones', None, 'Brown', None]
+            'Entity Type Code': ['1', '1', '1', '1', '1'],
+            'Provider Last Name (Legal Name)': ['Smith', 'Jones', None, 'Brown', None]
         })
         
-        metrics = profiler_agent._profile_column(df, 'Provider_Last_Name')
+        metrics = profiler_agent._profile_column(df, 'Provider Last Name (Legal Name)')
         
-        # For Entity Type Code = 1, Provider_Last_Name is required
+        # For Entity Type Code = 1, Provider Last Name (Legal Name) is required
         # 3 out of 5 are not null, so completeness should be 60%
         assert metrics.completeness_score == 60.0
     
     def test_profile_column_completeness_conditional_organization(self, profiler_agent):
         """Test column completeness calculation for conditional fields (Organization)."""
         df = pd.DataFrame({
-            'Entity_Type_Code': ['2', '2', '2', '2', '2'],
-            'Provider_Organization_Name': ['ABC Corp', 'XYZ Inc', None, 'DEF LLC', None]
+            'Entity Type Code': ['2', '2', '2', '2', '2'],
+            'Provider Organization Name (Legal Business Name)': ['ABC Corp', 'XYZ Inc', None, 'DEF LLC', None]
         })
         
-        metrics = profiler_agent._profile_column(df, 'Provider_Organization_Name')
+        metrics = profiler_agent._profile_column(df, 'Provider Organization Name (Legal Business Name)')
         
-        # For Entity Type Code = 2, Provider_Organization_Name is required
+        # For Entity Type Code = 2, Provider Organization Name (Legal Business Name) is required
         # 3 out of 5 are not null, so completeness should be 60%
         assert metrics.completeness_score == 60.0
     
     def test_profile_column_completeness_conditional_optional(self, profiler_agent):
         """Test column completeness calculation for optional fields."""
         df = pd.DataFrame({
-            'Entity_Type_Code': ['1', '1', '1', '1', '1'],
-            'Provider_Organization_Name': ['ABC Corp', None, None, None, None]
+            'Entity Type Code': ['1', '1', '1', '1', '1'],
+            'Provider Organization Name (Legal Business Name)': ['ABC Corp', None, None, None, None]
         })
         
-        metrics = profiler_agent._profile_column(df, 'Provider_Organization_Name')
+        metrics = profiler_agent._profile_column(df, 'Provider Organization Name (Legal Business Name)')
         
-        # For Entity Type Code = 1, Provider_Organization_Name is optional
+        # For Entity Type Code = 1, Provider Organization Name (Legal Business Name) is optional
         # All rows should be considered valid regardless of null values
         assert metrics.completeness_score == 100.0
     
@@ -244,8 +243,8 @@ class TestProfilerAgent:
         test_series = pd.Series([1, 2, 2, 3, 3])
         
         metrics = profiler_agent._profile_column(
-            pd.DataFrame({'test_col': test_series}), 
-            'test_col'
+            pd.DataFrame({'NPI': test_series}), 
+            'NPI'
         )
         
         assert metrics.unique_count == 3
@@ -277,7 +276,7 @@ class TestProfilerAgent:
         
         assert metrics.conforming_count == 1
         assert metrics.non_conforming_count == 2  # Excludes null
-        assert metrics.conformity_score == 50.0
+        assert metrics.conformity_score == pytest.approx(33.3333, rel=1e-3)
         assert '123456789' in metrics.conformity_violations
         assert '12345678ab' in metrics.conformity_violations
     
@@ -344,19 +343,19 @@ class TestProfilerAgent:
         """Test conditional completeness calculation."""
         # Test data with mixed Entity Type Codes
         df = pd.DataFrame({
-            'Entity_Type_Code': ['1', '1', '2', '2', '1'],
-            'Provider_Last_Name': ['Smith', None, 'Jones', 'Brown', 'Wilson'],
-            'Provider_Organization_Name': [None, None, 'ABC Corp', None, None]
+            'Entity Type Code': ['1', '1', '2', '2', '1'],
+            'Provider Last Name (Legal Name)': ['Smith', None, 'Jones', 'Brown', 'Wilson'],
+            'Provider Organization Name (Legal Business Name)': [None, None, 'ABC Corp', None, None]
         })
         
-        # Test Provider_Last_Name (required for Entity Type 1)
-        last_name_completeness = profiler_agent._calculate_conditional_completeness(df, 'Provider_Last_Name')
+        # Test Provider Last Name (Legal Name) (required for Entity Type 1)
+        last_name_completeness = profiler_agent._calculate_conditional_completeness(df, 'Provider Last Name (Legal Name)')
         # Entity Type 1: 2 out of 3 have values (Smith, Wilson), Entity Type 2: 2 out of 2 are optional
         # Total: 4 out of 5 = 80%
         assert last_name_completeness == 80.0
         
-        # Test Provider_Organization_Name (required for Entity Type 2)
-        org_name_completeness = profiler_agent._calculate_conditional_completeness(df, 'Provider_Organization_Name')
+        # Test Provider Organization Name (Legal Business Name) (required for Entity Type 2)
+        org_name_completeness = profiler_agent._calculate_conditional_completeness(df, 'Provider Organization Name (Legal Business Name)')
         # Entity Type 1: 3 out of 3 are optional, Entity Type 2: 1 out of 2 have values (ABC Corp)
         # Total: 4 out of 5 = 80%
         assert org_name_completeness == 80.0
@@ -372,7 +371,7 @@ class TestProfilerAgent:
         test_series = pd.Series(['1', '2', '3', '1', None])
         
         conforming, non_conforming, violations = profiler_agent._check_conformity(
-            test_series, 'Entity_Type_Code'
+            test_series, 'Entity Type Code'
         )
         
         assert conforming == 3  # Two '1's and one '2'
@@ -398,10 +397,10 @@ class TestProfilerAgent:
         # Create test data with mixed Entity Type Codes
         test_data = pd.DataFrame({
             'NPI': ['1234567890', '9876543210', '1111111111', '2222222222'],
-            'Entity_Type_Code': ['1', '1', '2', '2'],
-            'Provider_Last_Name': ['Smith', None, 'Jones', None],  # Required for Entity Type 1
-            'Provider_First_Name': ['John', 'Jane', None, None],  # Required for Entity Type 1
-            'Provider_Organization_Name': [None, None, 'ABC Corp', None]  # Required for Entity Type 2
+            'Entity Type Code': ['1', '1', '2', '2'],
+            'Provider Last Name (Legal Name)': ['Smith', None, 'Jones', None],  # Required for Entity Type 1
+            'Provider First Name': ['John', 'Jane', None, None],  # Required for Entity Type 1
+            'Provider Organization Name (Legal Business Name)': [None, None, 'ABC Corp', None]  # Required for Entity Type 2
         })
         
         profile = profiler_agent._profile_dataset(test_data, 'test.csv')
@@ -410,12 +409,12 @@ class TestProfilerAgent:
         # Should detect conditional completeness issues
         completeness_issues = [i for i in issues if i.issue_type == 'completeness']
         
-        # Check for Provider_Last_Name issue for Entity Type 1
-        last_name_issues = [i for i in completeness_issues if i.column_name == 'Provider_Last_Name']
+        # Check for Provider Last Name (Legal Name) issue for Entity Type 1
+        last_name_issues = [i for i in completeness_issues if i.column_name == 'Provider Last Name (Legal Name)']
         assert len(last_name_issues) > 0
         
-        # Check for Provider_Organization_Name issue for Entity Type 2
-        org_name_issues = [i for i in completeness_issues if i.column_name == 'Provider_Organization_Name']
+        # Check for Provider Organization Name (Legal Business Name) issue for Entity Type 2
+        org_name_issues = [i for i in completeness_issues if i.column_name == 'Provider Organization Name (Legal Business Name)']
         assert len(org_name_issues) > 0
     
     def test_detect_issues_conformity(self, profiler_agent, sample_npi_data):
@@ -451,8 +450,8 @@ class TestProfilerAgent:
         # Create dataset with poor overall completeness
         poor_quality_data = pd.DataFrame({
             'NPI': [None, None, '1234567890', None, None],
-            'Entity_Type_Code': [None, None, '1', None, None],
-            'Provider_Organization_Name': [None, None, 'Test Org', None, None]
+            'Entity Type Code': [None, None, '1', None, None],
+            'Provider Organization Name (Legal Business Name)': [None, None, 'Test Org', None, None]
         })
         
         profile = profiler_agent._profile_dataset(poor_quality_data, 'test.csv')
@@ -475,7 +474,7 @@ class TestProfilerAgent:
         # Check dataset profile
         profile = results.dataset_profile
         assert profile.total_rows == 5
-        assert profile.total_columns == 6
+        assert profile.total_columns == 5
         assert 'NPI' in profile.column_metrics
         
         # Check execution metadata
@@ -488,9 +487,9 @@ class TestProfilerAgent:
         # Create test data with duplicates in non-NPI columns but unique NPI
         test_data = pd.DataFrame({
             'NPI': ['1234567890', '9876543210', '1111111111'],  # All unique
-            'Entity_Type_Code': ['1', '1', '1'],  # Required for conditional completeness
-            'Provider_Last_Name': ['Smith', 'Smith', 'Smith'],  # All duplicates
-            'Provider_First_Name': ['John', 'John', 'John']      # All duplicates
+            'Entity Type Code': ['1', '1', '1'],  # Required for conditional completeness
+            'Provider Last Name (Legal Name)': ['Smith', 'Smith', 'Smith'],  # All duplicates
+            'Provider First Name': ['John', 'John', 'John']      # All duplicates
         })
         
         profile = profiler_agent._profile_dataset(test_data, 'test.csv')
@@ -501,15 +500,15 @@ class TestProfilerAgent:
         
         # Verify individual column metrics
         assert profile.column_metrics['NPI'].uniqueness_score == 100.0
-        assert profile.column_metrics['Provider_Last_Name'].uniqueness_score is None  # Should be None for non-NPI columns
-        assert profile.column_metrics['Provider_First_Name'].uniqueness_score is None  # Should be None for non-NPI columns
+        assert profile.column_metrics['Provider Last Name (Legal Name)'].uniqueness_score is None  # Should be None for non-NPI columns
+        assert profile.column_metrics['Provider First Name'].uniqueness_score is None  # Should be None for non-NPI columns
     
     def test_overall_uniqueness_no_npi_column(self, profiler_agent):
         """Test overall uniqueness when NPI column is not present."""
         test_data = pd.DataFrame({
-            'Entity_Type_Code': ['1', '1', '1'],  # Required for conditional completeness
-            'Provider_Last_Name': ['Smith', 'Smith', 'Smith'],  # All duplicates
-            'Provider_First_Name': ['John', 'John', 'John']      # All duplicates
+            'Entity Type Code': ['1', '1', '1'],  # Required for conditional completeness
+            'Provider Last Name (Legal Name)': ['Smith', 'Smith', 'Smith'],  # All duplicates
+            'Provider First Name': ['John', 'John', 'John']      # All duplicates
         })
         
         profile = profiler_agent._profile_dataset(test_data, 'test.csv')
@@ -565,8 +564,8 @@ class TestProfilerAgent:
         # Create larger test dataset
         large_data = pd.DataFrame({
             'NPI': ['1234567890'] * 1000 + ['invalid'] * 100,
-            'Entity_Type_Code': ['1'] * 500 + ['2'] * 500 + ['3'] * 100,
-            'Provider_Organization_Name': ['Test Org'] * 1100
+            'Entity Type Code': ['1'] * 500 + ['2'] * 500 + ['3'] * 100,
+            'Provider Organization Name (Legal Business Name)': ['Test Org'] * 1100
         })
         
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -636,8 +635,8 @@ class TestProfilerAgent:
         # Create large dataset simulation
         large_data = pd.DataFrame({
             'NPI': ['1234567890'] * 1000,
-            'Entity_Type_Code': ['1'] * 1000,
-            'Provider_Organization_Name': ['Test Org'] * 1000
+            'Entity Type Code': ['1'] * 1000,
+            'Provider Organization Name (Legal Business Name)': ['Test Org'] * 1000
         })
         
         # Enable sampling with small sample size
@@ -665,7 +664,7 @@ class TestProfilerAgent:
         """Test profiler behavior with empty dataset."""
         empty_data = pd.DataFrame({
             'NPI': [],
-            'Entity_Type_Code': []
+            'Entity Type Code': []
         })
         
         with tempfile.NamedTemporaryFile(mode='w', suffix='.csv', delete=False) as f:
@@ -692,22 +691,22 @@ def npi_test_data_generator():
         if scenario == 'perfect':
             return pd.DataFrame({
                 'NPI': ['1234567890', '9876543210', '1111111111'],
-                'Entity_Type_Code': ['1', '2', '1'],
-                'Provider_Organization_Name': ['ABC Medical', 'XYZ Healthcare', 'Test Clinic']
+                'Entity Type Code': ['1', '2', '1'],
+                'Provider Organization Name (Legal Business Name)': ['ABC Medical', 'XYZ Healthcare', 'Test Clinic']
             })
         
         elif scenario == 'all_invalid':
             return pd.DataFrame({
                 'NPI': ['123456789', '12345678ab', ''],
-                'Entity_Type_Code': ['3', 'X', ''],
-                'Provider_Organization_Name': ['', 'A', '']
+                'Entity Type Code': ['3', 'X', ''],
+                'Provider Organization Name (Legal Business Name)': ['', 'A', '']
             })
         
         elif scenario == 'mixed':
             return pd.DataFrame({
                 'NPI': ['1234567890', '123456789', None],
-                'Entity_Type_Code': ['1', '3', None],
-                'Provider_Organization_Name': ['Valid Org', 'A', None]
+                'Entity Type Code': ['1', '3', None],
+                'Provider Organization Name (Legal Business Name)': ['Valid Org', 'A', None]
             })
     
     return generate_data

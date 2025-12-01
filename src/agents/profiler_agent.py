@@ -7,10 +7,7 @@ import numpy as np
 import time
 import uuid
 from datetime import datetime
-from typing import Dict, List, Optional, Any, Tuple, TYPE_CHECKING
-
-if TYPE_CHECKING:
-    from src.agents.validator_agent import ValidatorAgent
+from typing import Dict, List, Optional, Any, Tuple
 from pathlib import Path
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
@@ -26,6 +23,11 @@ from src.core.validation_rule_loader import ValidationRuleLoader
 from src.agents.base_agent import BaseAgent
 from src.core.config_manager import ConfigManager
 from src.data_access.file_handler import FileHandler
+
+try:
+    from src.data_access.duckdb_manager import DuckDBManager
+except ImportError:  # pragma: no cover - handled gracefully when duckdb is absent
+    DuckDBManager = None  # type: ignore
 
 
 logger = logging.getLogger(__name__)
@@ -43,8 +45,7 @@ class ProfilerAgent(BaseAgent):
     
     def __init__(self, validation_rules: Optional[Dict[str, ValidationRule]] = None, 
                  config: Optional[Dict[str, Any]] = None,
-                 validation_rule_loader: Optional[ValidationRuleLoader] = None,
-                 validator_agent: Optional["ValidatorAgent"] = None):
+                 validation_rule_loader: Optional[ValidationRuleLoader] = None):
         """
         Initialize profiler agent.
         
@@ -52,7 +53,6 @@ class ProfilerAgent(BaseAgent):
             validation_rules: Custom validation rules. If None, loads from config.
             config: Agent configuration. If None, loads from config manager.
             validation_rule_loader: ValidationRuleLoader instance. If None, creates new one.
-            validator_agent: ValidatorAgent instance. If None, creates new one.
         """
         # Initialize base agent
         super().__init__("profiler", config)
@@ -62,22 +62,14 @@ class ProfilerAgent(BaseAgent):
             config_manager = ConfigManager()
             self.config = config_manager.get_agent_config("profiler")
         
-        # Initialize validator agent
-        if validator_agent is None:
-            # Import ValidatorAgent here to avoid circular imports
-            from src.agents.validator_agent import ValidatorAgent
-            # Initialize validation rule loader
-            self.validation_rule_loader = validation_rule_loader or ValidationRuleLoader()
-            # Create validator with validation rules
-            if validation_rules is None:
-                self.validator_agent = ValidatorAgent(validation_rule_loader=self.validation_rule_loader)
-            else:
-                self.validator_agent = ValidatorAgent(validation_rules=validation_rules)
+        # Initialize validation rule loader
+        self.validation_rule_loader = validation_rule_loader or ValidationRuleLoader()
+        
+        # Load validation rules
+        if validation_rules is None:
+            self.validation_rules = self.validation_rule_loader.load_validation_rules()
         else:
-            self.validator_agent = validator_agent
-            
-        # Keep reference to validation rules for backward compatibility
-        self.validation_rules = self.validator_agent.validation_rules
+            self.validation_rules = validation_rules
             
         self.universal_required_fields = ["NPI", "Entity Type Code"]
         
@@ -98,6 +90,26 @@ class ProfilerAgent(BaseAgent):
         # Progress tracking
         self.enable_progress_tracking = self.config.get('enable_progress_tracking', True)
         self.progress_update_interval = self.config.get('progress_update_interval', 10000)
+
+        # Storage configuration
+        storage_cfg = config_manager.get_config("storage", {}).get("duckdb", {})
+        self.storage_enabled = storage_cfg.get("enabled", False)
+        self.persist_results = self.storage_enabled and self.config.get('persist_results', True)
+        self.duckdb_manager = None
+        if self.persist_results and DuckDBManager is None:
+            logger.warning("DuckDBManager unavailable; disabling persistence.")
+            self.persist_results = False
+        elif self.persist_results:
+            self.duckdb_manager = DuckDBManager(
+                db_path=storage_cfg.get("path", "data/storage/dq_metrics.duckdb"),
+                profiling_run_table=storage_cfg.get("profiling_run_table", "profiling_runs"),
+                column_metrics_table=storage_cfg.get("column_metrics_table", "column_metrics"),
+                issues_table=storage_cfg.get("issues_table", "issues"),
+                anomalies_table=storage_cfg.get("anomalies_table", "anomalies"),
+                retention_days=storage_cfg.get("retention_days"),
+            )
+        elif not self.storage_enabled:
+            logger.info("DuckDB persistence disabled by configuration.")
         
         logger.info(f"ProfilerAgent initialized with {len(self.validation_rules)} validation rules")
     
@@ -145,6 +157,17 @@ class ProfilerAgent(BaseAgent):
                 "chunk_size": self.chunk_size,
                 "parallel_processing": self.parallel_processing
             })
+
+            # Assign run identifier and persist results when enabled
+            run_id = results.execution_metadata.get("run_id") or str(uuid.uuid4())
+            results.execution_metadata["run_id"] = run_id
+
+            if self.persist_results and self.duckdb_manager:
+                try:
+                    self.duckdb_manager.store_profile_results(results, run_id=run_id)
+                    logger.info("Persisted profiling run %s to DuckDB.", run_id)
+                except Exception as storage_error:
+                    logger.error("Failed to persist profiling results: %s", storage_error)
             
             logger.info(f"Profiling completed in {execution_time:.2f}s. "
                        f"Found {len(results.issues)} issues.")
@@ -355,32 +378,34 @@ class ProfilerAgent(BaseAgent):
         )
     
     def _check_conformity(self, series: pd.Series, column: str) -> Tuple[int, int, List[str]]:
-        """Check conformity of column values against validation rules using ValidatorAgent."""
-        return self.validator_agent.check_conformity(series, column)
-    
-    def calculate_completeness(self, df: pd.DataFrame, column: str) -> float:
-        """Calculate completeness rate for a specific column.
+        """Check conformity of column values against validation rules."""
+        if column not in self.validation_rules:
+            # If no rule defined, consider all non-null values as conforming
+            non_null_count = series.notna().sum()
+            return non_null_count, 0, []
         
-        Args:
-            df: DataFrame containing the data
-            column: Column name to analyze
-            
-        Returns:
-            Completeness rate as percentage (0-100)
-        """
-        return self._calculate_conditional_completeness(df, column)
-    
-    def analyze_completeness_issues(self, df: pd.DataFrame, column: str) -> List[Issue]:
-        """Analyze completeness issues for a specific column.
+        rule = self.validation_rules[column]
+        conforming_count = 0
+        violations = []
         
-        Args:
-            df: DataFrame containing the data
-            column: Column name to analyze
-            
-        Returns:
-            List of completeness issues found
-        """
-        return self._analyze_conditional_completeness_issues(df, column)
+        # Check each value that is not null according to our new logic
+        for value in series:
+            # Skip values that should be considered null for completeness
+            if is_value_null_for_completeness(value, column):
+                continue
+                
+            if rule.validate_value(value):
+                conforming_count += 1
+            else:
+                # Collect sample violations (limited by config)
+                if len(violations) < self.max_violation_examples:
+                    violations.append(str(value))
+        
+        # Calculate non-conforming count using our new null detection logic
+        non_null_count = count_non_null_values(series, column)
+        non_conforming_count = non_null_count - conforming_count
+        
+        return conforming_count, non_conforming_count, violations
     
     def _calculate_conditional_completeness(self, df: pd.DataFrame, column: str) -> float:
         """Calculate completeness based on conditional rules."""
@@ -550,7 +575,7 @@ class ProfilerAgent(BaseAgent):
                     percentage=(metrics.non_conforming_count / metrics.non_null_count * 100) if metrics.non_null_count > 0 else 0,
                     description=f"{column} has {metrics.non_conforming_count} values that don't match required format",
                     examples=metrics.conformity_violations[:5],  # First 5 violations as examples
-                    rule_violated=self.validator_agent.get_validation_rule(column).rule_id if self.validator_agent.has_validation_rule(column) else None
+                    rule_violated=self.validation_rules.get(column, {}).rule_id if column in self.validation_rules else None
                 ))
             
             # Uniqueness issues for fields that should be unique
@@ -575,7 +600,7 @@ class ProfilerAgent(BaseAgent):
                     percentage=100 - metrics.conformity_score,
                     description=f"{column} conformity ({metrics.conformity_score:.1f}%) below threshold",
                     examples=metrics.conformity_violations[:5],
-                    rule_violated=self.validator_agent.get_validation_rule(column).rule_id if self.validator_agent.has_validation_rule(column) else None
+                    rule_violated=self.validation_rules.get(column, {}).rule_id if column in self.validation_rules else None
                 ))
         
         # Dataset-level issues
@@ -934,7 +959,7 @@ class ProfilerAgent(BaseAgent):
                     percentage=(metrics['non_conforming_count'] / metrics['non_null_count'] * 100) if metrics['non_null_count'] > 0 else 0,
                     description=f"{column} has values that don't match required format",
                     examples=metrics['conformity_violations'][:5],
-                    rule_violated=self.validator_agent.get_validation_rule(column).rule_id if self.validator_agent.has_validation_rule(column) else None
+                    rule_violated=self.validation_rules.get(column, {}).rule_id if column in self.validation_rules else None
                 ))
         
         return issues
@@ -1089,7 +1114,7 @@ class ProfilerAgent(BaseAgent):
                     count=total_count,
                     percentage=total_percentage,
                     description=f"{column} has {total_count} {issue_type} issues across dataset",
-                    examples=all_examples[:10],  # Limit examples
+                    examples=all_examples[:self.max_violation_examples],  # Use configured max limit
                     rule_violated=issues[0].rule_violated if issues else None
                 ))
         
