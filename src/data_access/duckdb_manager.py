@@ -19,6 +19,11 @@ except ImportError as exc:
         "DuckDB package is required for persistence. Install with 'pip install duckdb'."
     ) from exc
 
+try:
+    import numpy as np
+except ImportError:
+    np = None
+
 from src.core.data_models import (
     Anomaly,
     ColumnMetrics,
@@ -60,10 +65,28 @@ class DuckDBManager:
             self.conn.close()
         except Exception as exc:
             logger.warning("Failed to close DuckDB connection: %s", exc)
-
     
     # Schema management
-   
+    
+    @staticmethod
+    def _convert_to_duckdb_type(value: Any) -> Any:
+        """
+        Convert numpy types to Python native types for DuckDB compatibility.
+        
+        Args:
+            value: Value that might be a numpy type
+            
+        Returns:
+            Python native type value
+        """
+        if np is not None and isinstance(value, np.integer):
+            return int(value)
+        elif np is not None and isinstance(value, np.floating):
+            return float(value)
+        elif isinstance(value, (int, float, str, type(None))):
+            return value
+        else:
+            return value
 
     def _ensure_schema(self) -> None:
         """Create required tables if they are missing."""
@@ -228,15 +251,15 @@ class DuckDBManager:
                 run_id,
                 profile.dataset_name,
                 profile.profiling_timestamp,
-                profile.total_rows,
-                profile.total_columns,
-                profile.overall_completeness,
-                profile.overall_uniqueness,
-                profile.overall_conformity,
-                exec_meta["execution_time_seconds"],
-                profile.data_size_mb,
+                self._convert_to_duckdb_type(profile.total_rows),
+                self._convert_to_duckdb_type(profile.total_columns),
+                self._convert_to_duckdb_type(profile.overall_completeness),
+                self._convert_to_duckdb_type(profile.overall_uniqueness),
+                self._convert_to_duckdb_type(profile.overall_conformity),
+                self._convert_to_duckdb_type(exec_meta["execution_time_seconds"]),
+                self._convert_to_duckdb_type(profile.data_size_mb),
                 exec_meta["processing_mode"],
-                exec_meta["rules_applied"],
+                self._convert_to_duckdb_type(exec_meta["rules_applied"]),
             ],
         )
 
@@ -254,18 +277,18 @@ class DuckDBManager:
                     run_id,
                     profile.dataset_name,
                     metrics.column_name,
-                    metrics.total_count,
-                    metrics.non_null_count,
-                    metrics.unique_count,
-                    metrics.duplicate_count,
-                    metrics.completeness_score,
-                    metrics.uniqueness_score,
-                    metrics.conformity_score,
-                    metrics.conforming_count,
-                    metrics.non_conforming_count,
-                    metrics.min_length,
-                    metrics.max_length,
-                    metrics.avg_length,
+                    self._convert_to_duckdb_type(metrics.total_count),
+                    self._convert_to_duckdb_type(metrics.non_null_count),
+                    self._convert_to_duckdb_type(metrics.unique_count),
+                    self._convert_to_duckdb_type(metrics.duplicate_count),
+                    self._convert_to_duckdb_type(metrics.completeness_score),
+                    self._convert_to_duckdb_type(metrics.uniqueness_score),
+                    self._convert_to_duckdb_type(metrics.conformity_score),
+                    self._convert_to_duckdb_type(metrics.conforming_count),
+                    self._convert_to_duckdb_type(metrics.non_conforming_count),
+                    self._convert_to_duckdb_type(metrics.min_length),
+                    self._convert_to_duckdb_type(metrics.max_length),
+                    self._convert_to_duckdb_type(metrics.avg_length),
                     json.dumps(metrics.most_common_values, default=str),
                     json.dumps(metrics.conformity_violations, default=str),
                 )
@@ -316,8 +339,8 @@ class DuckDBManager:
                     dataset_name,
                     issue.column_name,
                     issue.issue_type,
-                    issue.count,
-                    issue.percentage,
+                    self._convert_to_duckdb_type(issue.count),
+                    self._convert_to_duckdb_type(issue.percentage),
                     issue.description,
                     json.dumps(issue.examples, default=str),
                     issue.rule_violated,
@@ -512,10 +535,10 @@ class DuckDBManager:
                     record["dataset_name"],
                     record["column_name"],
                     record["metric"],
-                    record["current_value"],
-                    record["baseline_value"],
-                    record["delta"],
-                    record["z_score"],
+                    self._convert_to_duckdb_type(record["current_value"]),
+                    self._convert_to_duckdb_type(record["baseline_value"]),
+                    self._convert_to_duckdb_type(record["delta"]),
+                    self._convert_to_duckdb_type(record["z_score"]),
                     record["severity"],
                     record["detection_method"],
                     json.dumps(record.get("context", {}), default=str),

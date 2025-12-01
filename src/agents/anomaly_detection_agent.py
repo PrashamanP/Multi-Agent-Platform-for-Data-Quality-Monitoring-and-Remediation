@@ -80,6 +80,8 @@ class AnomalyDetectionAgent(BaseAgent):
         )
         self.zscore_threshold = self.config.get("zscore_threshold", 2.5)
         self.max_history_points = self.config.get("max_history_points", 50)
+        # Only flag degradations (negative changes), ignore improvements
+        self.flag_only_degradations = self.config.get("flag_only_degradations", True)
 
     def execute(
         self,
@@ -237,6 +239,10 @@ class AnomalyDetectionAgent(BaseAgent):
             z_score = float("inf")
         else:
             z_score = abs(delta) / std_dev
+
+        # If flag_only_degradations is True, ignore improvements (positive deltas)
+        if self.flag_only_degradations and delta > 0:
+            return None
 
         if abs_delta < threshold and (z_score < self.zscore_threshold):
             return None

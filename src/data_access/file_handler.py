@@ -57,6 +57,44 @@ class FileHandler:
             raise
     
     @staticmethod
+    def save_dataset(df: pd.DataFrame, file_path: str, **kwargs) -> None:
+        """Save dataset to various file formats based on path extension.
+        
+        Args:
+            df: DataFrame to save
+            file_path: Destination file path
+            **kwargs: Additional parameters for pandas write functions
+        """
+        path = Path(file_path)
+        file_extension = path.suffix.lower()
+
+        try:
+            if file_extension == '.csv':
+                csv_params = {
+                    'index': False,
+                    'encoding': 'utf-8'
+                }
+                csv_params.update(kwargs)
+                df.to_csv(path, **csv_params)
+            elif file_extension == '.parquet':
+                parquet_params = {
+                    'index': False
+                }
+                parquet_params.update(kwargs)
+                df.to_parquet(path, **parquet_params)
+            elif file_extension in ['.xlsx', '.xls']:
+                excel_params = {
+                    'index': False
+                }
+                excel_params.update(kwargs)
+                df.to_excel(path, **excel_params)
+            else:
+                raise ValueError(f"Unsupported file format for saving: {file_extension}")
+        except Exception as e:
+            logger.error(f"Failed to save dataset to {file_path}: {str(e)}")
+            raise
+    
+    @staticmethod
     def load_dataset_chunks(file_path: str, chunk_size: int = 50000, 
                            focused_columns_only: bool = True, **kwargs) -> Iterator[pd.DataFrame]:
         """

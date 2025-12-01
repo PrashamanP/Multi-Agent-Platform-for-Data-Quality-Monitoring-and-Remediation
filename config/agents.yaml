@@ -1,30 +1,5 @@
 # Agent configuration settings
 
-validator:
-  # Maximum number of violation examples to collect
-  max_violation_examples: 10
-  
-  # Performance settings - same as ProfilerAgent
-  parallel_processing: true
-  max_workers: 4
-  
-  # Chunked processing for large datasets  
-  enable_chunked_processing: true
-  chunk_size: 50000
-  chunked_processing_threshold_mb: 1000  # Enable chunked processing for files > 1GB
-  
-  # Sampling for large datasets
-  enable_sampling: false
-  sample_size: 100000
-  
-  # Memory management
-  memory_efficient_mode: true
-  optimize_dtypes: true
-  
-  # Progress tracking
-  enable_progress_tracking: true
-  progress_update_interval: 10000
-
 profiler:
   # Performance settings
   parallel_processing: true
@@ -44,6 +19,76 @@ profiler:
   
   # Progress tracking
   enable_progress_tracking: true
+  persist_results: true
   
   # Output settings
-  max_violation_examples: 10
+  max_violation_examples: 50  # Increased for better statistical confidence in fix recommendations
+
+anomaly_detection:
+  min_history_points: 3
+  max_history_points: 50
+  zscore_threshold: 2.5
+  delta_thresholds:
+    completeness: 10.0
+    uniqueness: 5.0
+    conformity: 5.0
+
+fix_recommendation:
+  # Confidence thresholds
+  confidence_threshold: 0.75
+  enable_auto_suggestions: true
+  enable_llm_fixes: false  # Set to true if using LLM-based fixes
+  
+  # Analysis settings
+  # IMPORTANT: When analyze_all_violations is true, ALL violations are analyzed for the most accurate confidence score.
+  # max_violation_examples_for_analysis is only used as a fallback when analyze_all_violations is false or dataset_path is not available.
+  analyze_all_violations: true  # If true and dataset_path available, analyze ALL violations (recommended for accurate confidence scores)
+  max_violation_examples_for_analysis: 50  # Fallback: only used if analyze_all_violations is false or dataset_path unavailable
+  
+  # LLM configuration (optional)
+  llm_config:
+    provider: "openai"  # or "anthropic", "local"
+    model: "gpt-4"
+    temperature: 0.3
+    max_tokens: 500
+
+fix_executor:
+  # Recommendations-only mode: if true, NO fixes are applied, only recommendations are generated
+  # All recommendations will appear in the CSV file, but no values will be written to fixed columns
+  recommendations_only: true
+  
+  # Backup and validation
+  create_backup: true
+  validate_after_fix: true
+        # Reference mapping files (optional - will use if available)
+        # City to state mapping file (CSV with city_name and state_code columns) - RECOMMENDED
+        city_state_mapping_file: "data/reference/city_state_mapping.csv"  # More reliable than postal codes
+        # Postal code to state mapping file (CSV with postal_code and state_code columns) - FALLBACK ONLY
+        postal_state_mapping_file: "data/reference/postal_state_mapping.csv"  # Use as last resort due to format inconsistencies
+        # State to country mapping file (CSV with state_name and country_code columns) - For foreign state validation
+        state_country_mapping_file: "data/reference/state_country_mapping.csv"
+  # Write mode: "in_place" overwrites dataset_path; "new_file" creates a new file with suffix
+  write_mode: "new_file"
+  new_file_suffix: "_fixed"
+  # Only apply fixes for these issue types
+  allowed_fix_types:
+    - "conformity"
+    # - "completeness"  # Disabled for now - not fixing completeness issues
+    # Note: uniqueness issues are flagged for review but not auto-fixed (requires investigation)
+  
+  # Reporting settings
+  # NOTE: ALL rows are processed and fixed. This setting only controls
+  # how many fix examples are stored in the results for reporting purposes.
+  max_sample_details: 10  # Increase this value to store more fix examples in results
+  
+  # Non-destructive fix mode
+  # If true, write recommended/fixed values to new columns instead of overwriting originals
+  # NOTE: These are automatically disabled when recommendations_only is true
+  add_fix_columns: true
+  fix_column_suffix: "__auto_fixed"
+  add_fix_flags: true  # adds <col>__fix_applied and <col>__fix_reason
+  add_recommendation_column: true  # adds <col>__recommendation with human-readable recommendation text
+  
+  # Per-row recommendation sidecar output
+  # Options: null (disabled) | "same_dir" (create alongside output dataset)
+  emit_recommendations_sidecar: "same_dir"

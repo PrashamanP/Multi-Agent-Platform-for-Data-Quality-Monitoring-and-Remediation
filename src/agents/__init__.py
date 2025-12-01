@@ -1,9 +1,11 @@
-"""
-Agents module for data quality processing.
-"""
+"""Agent package exports."""
 
-from .base_agent import BaseAgent
+from .anomaly_detection_agent import AnomalyDetectionAgent
 from .profiler_agent import ProfilerAgent
-from .validator_agent import ValidatorAgent
+from .fix_recommendation_agent import FixRecommendationAgent
 
-__all__ = ['BaseAgent', 'ProfilerAgent', 'ValidatorAgent']
+__all__ = [
+    "AnomalyDetectionAgent",
+    "ProfilerAgent",
+    "FixRecommendationAgent",
+]

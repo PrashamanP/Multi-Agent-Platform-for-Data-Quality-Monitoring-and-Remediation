@@ -1,0 +1,308 @@
+state_name,country_code
+Alberta,CA
+British Columbia,CA
+Manitoba,CA
+New Brunswick,CA
+Newfoundland and Labrador,CA
+Northwest Territories,CA
+Nova Scotia,CA
+Nunavut,CA
+Ontario,CA
+Prince Edward Island,CA
+Quebec,CA
+Saskatchewan,CA
+Yukon,CA
+Aguascalientes,MX
+Baja California,MX
+Baja California Sur,MX
+Campeche,MX
+Chiapas,MX
+Chihuahua,MX
+Coahuila,MX
+Colima,MX
+Durango,MX
+Guanajuato,MX
+Guerrero,MX
+Hidalgo,MX
+Jalisco,MX
+México,MX
+Mexico,MX
+Michoacán,MX
+Morelos,MX
+Nayarit,MX
+Nuevo León,MX
+Oaxaca,MX
+Puebla,MX
+Querétaro,MX
+Quintana Roo,MX
+San Luis Potosí,MX
+Sinaloa,MX
+Sonora,MX
+Tabasco,MX
+Tamaulipas,MX
+Tlaxcala,MX
+Veracruz,MX
+Yucatán,MX
+Zacatecas,MX
+England,GB
+Scotland,GB
+Wales,GB
+Northern Ireland,GB
+New South Wales,AU
+Victoria,AU
+Queensland,AU
+Western Australia,AU
+South Australia,AU
+Tasmania,AU
+Australian Capital Territory,AU
+Northern Territory,AU
+Baden-Württemberg,DE
+Bavaria,DE
+Berlin,DE
+Brandenburg,DE
+Bremen,DE
+Hamburg,DE
+Hesse,DE
+Lower Saxony,DE
+Mecklenburg-Vorpommern,DE
+North Rhine-Westphalia,DE
+Rhineland-Palatinate,DE
+Saarland,DE
+Saxony,DE
+Saxony-Anhalt,DE
+Schleswig-Holstein,DE
+Thuringia,DE
+Île-de-France,FR
+Auvergne-Rhône-Alpes,FR
+Nouvelle-Aquitaine,FR
+Occitanie,FR
+Hauts-de-France,FR
+Grand Est,FR
+Pays de la Loire,FR
+Normandy,FR
+Brittany,FR
+Bourgogne-Franche-Comté,FR
+Centre-Val de Loire,FR
+Provence-Alpes-Côte d'Azur,FR
+Corse,FR
+Guadeloupe,FR
+Martinique,FR
+Guyane,FR
+La Réunion,FR
+Mayotte,FR
+Andhra Pradesh,IN
+Arunachal Pradesh,IN
+Assam,IN
+Bihar,IN
+Chhattisgarh,IN
+Goa,IN
+Gujarat,IN
+Haryana,IN
+Himachal Pradesh,IN
+Jharkhand,IN
+Karnataka,IN
+Kerala,IN
+Madhya Pradesh,IN
+Maharashtra,IN
+Manipur,IN
+Meghalaya,IN
+Mizoram,IN
+Nagaland,IN
+Odisha,IN
+Punjab,IN
+Rajasthan,IN
+Sikkim,IN
+Tamil Nadu,IN
+Telangana,IN
+Tripura,IN
+Uttar Pradesh,IN
+Uttarakhand,IN
+West Bengal,IN
+Andaman and Nicobar Islands,IN
+Chandigarh,IN
+Dadra and Nagar Haveli and Daman and Diu,IN
+Delhi,IN
+Jammu and Kashmir,IN
+Ladakh,IN
+Lakshadweep,IN
+Puducherry,IN
+São Paulo,BR
+Rio de Janeiro,BR
+Minas Gerais,BR
+Bahia,BR
+Paraná,BR
+Rio Grande do Sul,BR
+Pernambuco,BR
+Ceará,BR
+Pará,BR
+Santa Catarina,BR
+Goiás,BR
+Maranhão,BR
+Paraíba,BR
+Espírito Santo,BR
+Piauí,BR
+Alagoas,BR
+Rio Grande do Norte,BR
+Mato Grosso,BR
+Mato Grosso do Sul,BR
+Sergipe,BR
+Rondônia,BR
+Tocantins,BR
+Acre,BR
+Amapá,BR
+Amazonas,BR
+Roraima,BR
+Distrito Federal,BR
+Beijing,CN
+Tianjin,CN
+Hebei,CN
+Shanxi,CN
+Inner Mongolia,CN
+Liaoning,CN
+Jilin,CN
+Heilongjiang,CN
+Shanghai,CN
+Jiangsu,CN
+Zhejiang,CN
+Anhui,CN
+Fujian,CN
+Jiangxi,CN
+Shandong,CN
+Henan,CN
+Hubei,CN
+Hunan,CN
+Guangdong,CN
+Guangxi,CN
+Hainan,CN
+Chongqing,CN
+Sichuan,CN
+Guizhou,CN
+Yunnan,CN
+Tibet,CN
+Shaanxi,CN
+Gansu,CN
+Qinghai,CN
+Ningxia,CN
+Xinjiang,CN
+Hong Kong,CN
+Macau,CN
+Tokyo,JP
+Kanagawa,JP
+Osaka,JP
+Aichi,JP
+Fukuoka,JP
+Hokkaido,JP
+Hyogo,JP
+Kyoto,JP
+Saitama,JP
+Chiba,JP
+Shizuoka,JP
+Ibaraki,JP
+Hiroshima,JP
+Niigata,JP
+Miyagi,JP
+Nagano,JP
+Gifu,JP
+Gunma,JP
+Okayama,JP
+Fukushima,JP
+Kumamoto,JP
+Kagoshima,JP
+Yamaguchi,JP
+Tochigi,JP
+Mie,JP
+Ehime,JP
+Nagasaki,JP
+Shiga,JP
+Nara,JP
+Aomori,JP
+Iwate,JP
+Yamagata,JP
+Akita,JP
+Ishikawa,JP
+Fukui,JP
+Toyama,JP
+Wakayama,JP
+Tottori,JP
+Shimane,JP
+Tokushima,JP
+Kochi,JP
+Saga,JP
+Oita,JP
+Miyazaki,JP
+Kagawa,JP
+Okinawa,JP
+Yamanashi,JP
+Gyeonggi-do,KR
+Seoul,KR
+Busan,KR
+Incheon,KR
+Daegu,KR
+Daejeon,KR
+Gwangju,KR
+Ulsan,KR
+Sejong,KR
+Gangwon-do,KR
+Chungcheongbuk-do,KR
+Chungcheongnam-do,KR
+Jeollabuk-do,KR
+Jeollanam-do,KR
+Gyeongsangbuk-do,KR
+Gyeongsangnam-do,KR
+Jeju-do,KR
+Lombardy,IT
+Lazio,IT
+Campania,IT
+Sicily,IT
+Veneto,IT
+Emilia-Romagna,IT
+Piedmont,IT
+Puglia,IT
+Tuscany,IT
+Calabria,IT
+Sardinia,IT
+Liguria,IT
+Marche,IT
+Abruzzo,IT
+Friuli-Venezia Giulia,IT
+Trentino-Alto Adige,IT
+Umbria,IT
+Basilicata,IT
+Molise,IT
+Valle d'Aosta,IT
+Madrid,ES
+Catalonia,ES
+Andalusia,ES
+Valencia,ES
+Galicia,ES
+Castile and León,ES
+Basque Country,ES
+Castile-La Mancha,ES
+Canary Islands,ES
+Murcia,ES
+Aragon,ES
+Extremadura,ES
+Balearic Islands,ES
+Asturias,ES
+Navarre,ES
+Cantabria,ES
+La Rioja,ES
+Ceuta,ES
+Melilla,ES
+Ontario,CA
+Quebec,CA
+British Columbia,CA
+Alberta,CA
+Manitoba,CA
+Saskatchewan,CA
+Nova Scotia,CA
+New Brunswick,CA
+Newfoundland and Labrador,CA
+Prince Edward Island,CA
+Northwest Territories,CA
+Nunavut,CA
+Yukon,CA
+AB,CA
+Azuay,EC
+AZUAY,EC
+

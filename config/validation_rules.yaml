@@ -117,29 +117,29 @@ rules:
     rule_id: "PROVIDER_BUSINESS_MAILING_ADDRESS_STATE_NAME_FORMAT"
     rule_type: "enum"
     rule_config:
-      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW"]
-    description: "Provider Business Mailing Address State Name must be valid USPS state/territory code"
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Provider Business Mailing Address State Name must be valid USPS state/territory code (including military codes AE, AP, AA)"
 
   "Provider Business Practice Location Address State Name":
     rule_id: "PROVIDER_BUSINESS_PRACTICE_LOCATION_ADDRESS_STATE_NAME_FORMAT"
     rule_type: "enum"
     rule_config:
-      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW"]
-    description: "Provider Business Practice Location Address State Name must be valid USPS state/territory code"
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Provider Business Practice Location Address State Name must be valid USPS state/territory code (including military codes AE, AP, AA)"
 
   "Provider License Number State Code_1":
     rule_id: "PROVIDER_LICENSE_NUMBER_STATE_CODE_1_FORMAT"
     rule_type: "enum"
     rule_config:
-      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW"]
-    description: "Provider License Number State Code_1 must be valid USPS state/territory code"
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Provider License Number State Code_1 must be valid USPS state/territory code (including military codes AE, AP, AA)"
 
   "Provider License Number State Code_2":
     rule_id: "PROVIDER_LICENSE_NUMBER_STATE_CODE_2_FORMAT"
     rule_type: "enum"
     rule_config:
-      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW"]
-    description: "Provider License Number State Code_2 must be valid USPS state/territory code"
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Provider License Number State Code_2 must be valid USPS state/territory code (including military codes AE, AP, AA)"
 
   # Postal Code Rules
   "Provider Business Mailing Address Postal Code":
@@ -280,7 +280,7 @@ rules:
     rule_type: "length"
     rule_config:
       min: 1
-      max: 50
+      max: 100
     description: "Other Provider Identifier_1 must be 1-50 characters"
 
   "Other Provider Identifier_2":
@@ -288,7 +288,7 @@ rules:
     rule_type: "length"
     rule_config:
       min: 1
-      max: 50
+      max: 100
     description: "Other Provider Identifier_2 must be 1-50 characters"
 
   # Other Provider Identifier Type Code Rules
@@ -313,15 +313,15 @@ rules:
     rule_id: "OTHER_PROVIDER_IDENTIFIER_STATE_1_FORMAT"
     rule_type: "enum"
     rule_config:
-      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW"]
-    description: "Other Provider Identifier State_1 must be valid USPS state/territory code"
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Other Provider Identifier State_1 must be valid USPS state/territory code (including military codes AE, AP, AA)"
 
   "Other Provider Identifier State_2":
     rule_id: "OTHER_PROVIDER_IDENTIFIER_STATE_2_FORMAT"
     rule_type: "enum"
     rule_config:
-      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW"]
-    description: "Other Provider Identifier State_2 must be valid USPS state/territory code"
+      values: ["AL", "AK", "AZ", "AR", "CA", "CO", "CT", "DE", "FL", "GA", "HI", "ID", "IL", "IN", "IA", "KS", "KY", "LA", "ME", "MD", "MA", "MI", "MN", "MS", "MO", "MT", "NE", "NV", "NH", "NJ", "NM", "NY", "NC", "ND", "OH", "OK", "OR", "PA", "RI", "SC", "SD", "TN", "TX", "UT", "VT", "VA", "WA", "WV", "WI", "WY", "DC", "AS", "GU", "MP", "PR", "VI", "FM", "MH", "PW", "AE", "AP", "AA"]
+    description: "Other Provider Identifier State_2 must be valid USPS state/territory code (including military codes AE, AP, AA)"
 
   # Other Provider Identifier Issuer Rules
   "Other Provider Identifier Issuer_1":
@@ -329,7 +329,7 @@ rules:
     rule_type: "length"
     rule_config:
       min: 1
-      max: 50
+      max: 100
     description: "Other Provider Identifier Issuer_1 must be 1-50 characters"
 
   "Other Provider Identifier Issuer_2":
@@ -337,7 +337,7 @@ rules:
     rule_type: "length"
     rule_config:
       min: 1
-      max: 50
+      max: 100
     description: "Other Provider Identifier Issuer_2 must be 1-50 characters"
 
 # Field categorization for completeness analysis
