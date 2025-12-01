@@ -1,0 +1,49 @@
+# Agent configuration settings
+
+validator:
+  # Maximum number of violation examples to collect
+  max_violation_examples: 10
+  
+  # Performance settings - same as ProfilerAgent
+  parallel_processing: true
+  max_workers: 4
+  
+  # Chunked processing for large datasets  
+  enable_chunked_processing: true
+  chunk_size: 50000
+  chunked_processing_threshold_mb: 1000  # Enable chunked processing for files > 1GB
+  
+  # Sampling for large datasets
+  enable_sampling: false
+  sample_size: 100000
+  
+  # Memory management
+  memory_efficient_mode: true
+  optimize_dtypes: true
+  
+  # Progress tracking
+  enable_progress_tracking: true
+  progress_update_interval: 10000
+
+profiler:
+  # Performance settings
+  parallel_processing: true
+  max_workers: 4
+  
+  # Chunked processing for large datasets
+  enable_chunked_processing: true
+  chunk_size: 50000
+  chunked_processing_threshold_mb: 1000  # Enable chunked processing for files > 1GB
+  
+  # Sampling for large datasets (disabled for full dataset profiling)
+  enable_sampling: false
+  sample_size: 100000
+  
+  # Memory management
+  optimize_dtypes: true
+  
+  # Progress tracking
+  enable_progress_tracking: true
+  
+  # Output settings
+  max_violation_examples: 10
