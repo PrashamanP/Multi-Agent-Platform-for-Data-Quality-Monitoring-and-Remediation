@@ -68,7 +68,7 @@ pip install -r requirements.txt
 
 ### Full pipeline (all four agents)
 ```bash
-# Uses bundled sample data, writes fixed copy plus sidecar CSVs
+# Uses bundled sample data, writes fixed copy plus sidecar CSVs to data/output
 python scripts/run_pipeline.py \
   --dataset data/input/npidata_sample_100.csv \
   --output-file data/output/npidata_sample_100_fixed.csv

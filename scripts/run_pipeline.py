@@ -102,11 +102,12 @@ def main() -> int:
         print(f"Dataset not found: {dataset_path}")
         return 1
 
-    output_path = (
-        Path(args.output_file)
-        if args.output_file
-        else dataset_path.with_name(f"{dataset_path.stem}_fixed{dataset_path.suffix}")
-    )
+    if args.output_file:
+        output_path = Path(args.output_file)
+    else:
+        # Default to data/output so we don't write into the input folder
+        output_dir = Path("data/output")
+        output_path = output_dir / f"{dataset_path.stem}_fixed{dataset_path.suffix}"
     ensure_dirs(output_path)
 
     print_divider("RUNNING DATA QUALITY PIPELINE")
