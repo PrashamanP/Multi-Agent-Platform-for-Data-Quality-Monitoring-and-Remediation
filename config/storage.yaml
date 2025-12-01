@@ -1,0 +1,10 @@
+# Storage configuration for persistence of profiling results and anomalies
+
+duckdb:
+  enabled: true
+  path: "data/storage/dq_metrics.duckdb"
+  profiling_run_table: "profiling_runs"
+  column_metrics_table: "column_metrics"
+  issues_table: "issues"
+  anomalies_table: "anomalies"
+  retention_days: 180
