@@ -72,12 +72,10 @@ pip install -r requirements.txt
 python scripts/run_pipeline.py \
   --dataset data/input/npidata_sample_100.csv \
   --output-file data/output/npidata_sample_100_fixed.csv
-
-# Skip anomaly detection if DuckDB is unavailable
-python scripts/run_pipeline.py --dataset data/input/npidata_sample_100.csv --skip-anomaly-detection
 ```
 
-**Fix execution behavior (default):** The executor now applies both conformity and completeness fixes (recommendations_only is false, and "completeness" is in allowed_fix_types). To run in recommendations-only mode, set `recommendations_only: true` in `config/agents.yaml` (and rebuild the Docker image if using Docker).
+- For the full baseline dataset, point to the larger file (may take longer):  
+  `python scripts/run_pipeline.py --dataset data/input/npidata_baseline.csv --output-file data/output/npidata_baseline_fixed.csv`
 
 ### Profiler demo
 ```bash
@@ -121,7 +119,9 @@ The fix recommendation agent analyzes issues and anomalies to suggest intelligen
   `docker run --rm -v $(pwd)/data:/app/data dq-pipeline --dataset data/input/npidata_sample_100.csv --output-file data/output/npidata_sample_100_fixed.csv`
 - Compose alternative (uses `DATASET_PATH` and `OUTPUT_PATH`):  
   `DATASET_PATH=data/input/npidata_sample_100.csv OUTPUT_PATH=data/output/npidata_sample_100_fixed.csv docker compose run dq-pipeline`
-- If you change `config/agents.yaml` (e.g., toggle recommendations_only), rebuild the image before rerunning.
+- For the full baseline dataset:  
+  `docker run --rm -v $(pwd)/data:/app/data dq-pipeline --dataset data/input/npidata_baseline.csv --output-file data/output/npidata_baseline_fixed.csv`
+  (or set `DATASET_PATH`/`OUTPUT_PATH` in compose accordingly).
 
 ### Query DuckDB Storage
 ```bash
