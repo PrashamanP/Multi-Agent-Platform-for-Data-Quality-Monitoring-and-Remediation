@@ -210,5 +210,4 @@ __marimo__/
 npidata.csv
 results/
 
-.DS_Store
-*.log
+.DS_Storedata/input/dataset.csv

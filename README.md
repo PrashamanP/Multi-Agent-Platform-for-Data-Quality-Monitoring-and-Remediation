@@ -74,7 +74,56 @@ python scripts/demo_profiler.py --dataset data/input/npidata_sample_100.csv
 python scripts/demo_profiler.py --dataset data/input/npidata_sample_100.csv --verbose
 ```
 
+### DuckDB Storage Setup
+- Profiling metrics are automatically persisted to DuckDB at `data/storage/dq_metrics.duckdb` (configure via `config/storage.yaml`).
+- Schemas are created lazily on first use; no manual migrations are required.
+- Ensure the `duckdb` Python package is installed (`pip install duckdb`) when enabling persistence.
+
+### Anomaly Detection Demo
+```bash
+# Profile the dataset and immediately run anomaly detection
+python scripts/demo_anomaly_detection.py --dataset data/input/npidata_sample_1000.csv --verbose
+
+# Reuse the latest persisted run without re-profiling
+python scripts/demo_anomaly_detection.py --dataset data/input/npidata_sample_1000.csv --skip-profiling
+```
+
+The anomaly agent compares the current profiling run against historical metrics stored in DuckDB and surfaces significant shifts for review.
+
+### Fix Recommendation Demo
+```bash
+# Run complete pipeline: profiler → anomaly detection → fix recommendations
+python scripts/demo_fix_recommendation.py --dataset data/input/npidata_sample_100.csv
+
+# Skip anomaly detection (if DuckDB not available)
+python scripts/demo_fix_recommendation.py --dataset data/input/npidata_sample_100.csv --skip-anomaly-detection
+
+# Export recommendations to JSON
+python scripts/demo_fix_recommendation.py --dataset data/input/npidata_sample_100.csv --output-json results.json
+```
+
+The fix recommendation agent analyzes issues and anomalies to suggest intelligent fixes with confidence scores.
+
+### Query DuckDB Storage
+```bash
+# View all stored data (runs, issues, anomalies)
+python scripts/query_duckdb.py
+
+# View only profiling runs
+python scripts/query_duckdb.py --runs-only
+
+# View only issues
+python scripts/query_duckdb.py --issues-only
+
+# View only anomalies
+python scripts/query_duckdb.py --anomalies-only
+
+# Limit results
+python scripts/query_duckdb.py --limit 5
+```
+
 ### Output Files
 The system generates several output files:
 - **Column Details CSV**: Detailed metrics for each column (`data/results/`)
 - **Profiling Logs**: Execution logs (`profiler_demo.log`)
+- **DuckDB Storage**: `data/storage/dq_metrics.duckdb` (profiling runs, metrics, issues, anomalies)
