@@ -1,0 +1,13 @@
+version: "3.9"
+
+services:
+  dq-pipeline:
+    build: .
+    image: dq-pipeline:latest
+    volumes:
+      - ./data:/app/data
+    environment:
+      DATASET_PATH: ${DATASET_PATH:-data/input/npidata_sample_100.csv}
+      OUTPUT_PATH: ${OUTPUT_PATH:-data/output/npidata_sample_100_fixed.csv}
+    entrypoint: ["python", "scripts/run_pipeline.py"]
+    command: ["--dataset", "${DATASET_PATH}", "--output-file", "${OUTPUT_PATH}"]

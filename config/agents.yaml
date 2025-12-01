@@ -55,25 +55,25 @@ fix_recommendation:
 fix_executor:
   # Recommendations-only mode: if true, NO fixes are applied, only recommendations are generated
   # All recommendations will appear in the CSV file, but no values will be written to fixed columns
-  recommendations_only: true
+  recommendations_only: false
   
   # Backup and validation
   create_backup: true
   validate_after_fix: true
-        # Reference mapping files (optional - will use if available)
-        # City to state mapping file (CSV with city_name and state_code columns) - RECOMMENDED
-        city_state_mapping_file: "data/reference/city_state_mapping.csv"  # More reliable than postal codes
-        # Postal code to state mapping file (CSV with postal_code and state_code columns) - FALLBACK ONLY
-        postal_state_mapping_file: "data/reference/postal_state_mapping.csv"  # Use as last resort due to format inconsistencies
-        # State to country mapping file (CSV with state_name and country_code columns) - For foreign state validation
-        state_country_mapping_file: "data/reference/state_country_mapping.csv"
+  # Reference mapping files (optional - will use if available)
+  # City to state mapping file (CSV with city_name and state_code columns) - RECOMMENDED
+  city_state_mapping_file: "data/reference/city_state_mapping.csv"  # More reliable than postal codes
+  # Postal code to state mapping file (CSV with postal_code and state_code columns) - FALLBACK ONLY
+  postal_state_mapping_file: "data/reference/postal_state_mapping.csv"  # Use as last resort due to format inconsistencies
+  # State to country mapping file (CSV with state_name and country_code columns) - For foreign state validation
+  state_country_mapping_file: "data/reference/state_country_mapping.csv"
   # Write mode: "in_place" overwrites dataset_path; "new_file" creates a new file with suffix
   write_mode: "new_file"
   new_file_suffix: "_fixed"
   # Only apply fixes for these issue types
   allowed_fix_types:
     - "conformity"
-    # - "completeness"  # Disabled for now - not fixing completeness issues
+    - "completeness"
     # Note: uniqueness issues are flagged for review but not auto-fixed (requires investigation)
   
   # Reporting settings

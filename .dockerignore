@@ -1,0 +1,16 @@
+.git
+.venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.tmp
+.ipynb_checkpoints
+dist
+build
+*.egg-info
+profiler_demo.log
+data/storage/*
+data/results/*
+data/output/*
