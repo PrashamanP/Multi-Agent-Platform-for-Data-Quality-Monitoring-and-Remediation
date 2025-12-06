@@ -1,0 +1,70 @@
+row_index,column,issue_type,original_value,recommended_value,strategy,confidence,reason
+30,Provider Business Mailing Address Postal Code,conformity,80511606.0,805116060,format_correction,0.9,regex cleanup
+31,Provider Business Mailing Address Postal Code,conformity,61051770.0,610517700,format_correction,0.9,regex cleanup
+45,Provider Business Mailing Address Postal Code,conformity,80941137.0,809411370,format_correction,0.9,regex cleanup
+65,Provider Business Mailing Address Postal Code,conformity,80941137.0,809411370,format_correction,0.9,regex cleanup
+85,Provider Business Mailing Address Postal Code,conformity,61091278.0,610912780,format_correction,0.9,regex cleanup
+86,Provider Business Mailing Address Postal Code,conformity,76451718.0,764517180,format_correction,0.9,regex cleanup
+96,Provider Business Mailing Address Postal Code,conformity,31011325.0,310113250,format_correction,0.9,regex cleanup
+30,Provider Business Practice Location Address Postal Code,conformity,80511606.0,805116060,format_correction,0.9,regex cleanup
+31,Provider Business Practice Location Address Postal Code,conformity,61051208.0,610512080,format_correction,0.9,regex cleanup
+45,Provider Business Practice Location Address Postal Code,conformity,80941137.0,809411370,format_correction,0.9,regex cleanup
+65,Provider Business Practice Location Address Postal Code,conformity,80941137.0,809411370,format_correction,0.9,regex cleanup
+85,Provider Business Practice Location Address Postal Code,conformity,61051770.0,610517700,format_correction,0.9,regex cleanup
+96,Provider Business Practice Location Address Postal Code,conformity,31011325.0,310113250,format_correction,0.9,regex cleanup
+7,Provider License Number_1,conformity,000396-1,0003961,format_correction,0.9,regex cleanup
+27,Provider License Number_1,conformity,R-268,R268,format_correction,0.9,regex cleanup
+32,Provider License Number_1,conformity,113541-1,1135411,format_correction,0.9,regex cleanup
+43,Provider License Number_1,conformity,010521-1,0105211,format_correction,0.9,regex cleanup
+56,Provider License Number_1,conformity,35-78271,3578271,format_correction,0.9,regex cleanup
+59,Provider License Number_1,conformity,0337916-21,033791621,format_correction,0.9,regex cleanup
+91,Provider License Number_1,conformity,MD 18839,MD18839,format_correction,0.9,regex cleanup
+97,Provider License Number_1,conformity,060-209,060209,format_correction,0.9,regex cleanup
+43,Healthcare Provider Primary Taxonomy Switch_1,conformity,X,,format_correction,0.65,Need Review
+86,Healthcare Provider Primary Taxonomy Switch_1,conformity,X,,format_correction,0.65,Need Review
+16,Provider License Number_2,conformity,35-037876,35037876,format_correction,0.9,regex cleanup
+27,Provider License Number_2,conformity,N-0268,N0268,format_correction,0.9,regex cleanup
+33,Provider License Number_2,conformity,225687-1,2256871,format_correction,0.9,regex cleanup
+43,Provider License Number_2,conformity,010521-1,0105211,format_correction,0.9,regex cleanup
+59,Provider License Number_2,conformity,COA.08314-NP,COA08314NP,format_correction,0.9,regex cleanup
+60,Provider License Number_2,conformity,314751-0501,3147510501,format_correction,0.9,regex cleanup
+66,Provider License Number_2,conformity,AMD-974,AMD974,format_correction,0.9,regex cleanup
+86,Provider License Number_2,conformity,0838-IC,0838IC,format_correction,0.9,regex cleanup
+43,Healthcare Provider Primary Taxonomy Switch_2,conformity,X,,format_correction,0.65,Need Review
+86,Healthcare Provider Primary Taxonomy Switch_2,conformity,X,,format_correction,0.65,Need Review
+3,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+20,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+35,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+52,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+87,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+89,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+3,Provider Business Mailing Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+20,Provider Business Mailing Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+35,Provider Business Mailing Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+52,Provider Business Mailing Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+87,Provider Business Mailing Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+89,Provider Business Mailing Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+3,Provider Business Mailing Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+20,Provider Business Mailing Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+35,Provider Business Mailing Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+52,Provider Business Mailing Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+87,Provider Business Mailing Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+89,Provider Business Mailing Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+3,Provider Business Practice Location Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+20,Provider Business Practice Location Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+35,Provider Business Practice Location Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+52,Provider Business Practice Location Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+87,Provider Business Practice Location Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+89,Provider Business Practice Location Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+3,Provider Business Practice Location Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+20,Provider Business Practice Location Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+35,Provider Business Practice Location Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+52,Provider Business Practice Location Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+87,Provider Business Practice Location Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+89,Provider Business Practice Location Address State Name,completeness,,,context_imputation,0.85,Inference failed - insufficient context or not found in reference files
+3,Provider Business Practice Location Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+20,Provider Business Practice Location Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+35,Provider Business Practice Location Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+52,Provider Business Practice Location Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+87,Provider Business Practice Location Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
+89,Provider Business Practice Location Address Country Code (If outside U.S.),completeness,,US,default_imputation,0.75,Default imputation (standard value)
