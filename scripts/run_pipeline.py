@@ -70,6 +70,10 @@ def main() -> int:
         help="Path to input dataset (CSV/Parquet/Excel). Default uses bundled sample.",
     )
     parser.add_argument(
+        "--dataset-name",
+        help="Optional dataset identifier to use in DuckDB history (defaults to file stem).",
+    )
+    parser.add_argument(
         "--output-file",
         help="Where to write the fixed dataset. Defaults to <dataset>_fixed.<ext> next to input.",
     )
@@ -110,14 +114,17 @@ def main() -> int:
         output_path = output_dir / f"{dataset_path.stem}_fixed{dataset_path.suffix}"
     ensure_dirs(output_path)
 
+    dataset_name = args.dataset_name
     print_divider("RUNNING DATA QUALITY PIPELINE")
     print(f"Dataset: {dataset_path}")
+    if dataset_name:
+        print(f"Dataset name (override): {dataset_name}")
 
     try:
         # Step 1: Profiling
         print_divider("STEP 1/4 - Profiling")
         profiler = ProfilerAgent()
-        profile_results = profiler.execute(str(dataset_path))
+        profile_results = profiler.execute(str(dataset_path), dataset_name=dataset_name)
         profile = profile_results.dataset_profile
         print(
             f"Rows: {profile.total_rows:,}, Columns: {profile.total_columns}, "

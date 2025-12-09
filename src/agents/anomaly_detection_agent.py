@@ -193,6 +193,7 @@ class AnomalyDetectionAgent(BaseAgent):
                     metric=metric_name,
                     limit=self.max_history_points,
                     exclude_run_id=run_id,
+                    before_timestamp=profile.profiling_timestamp,
                 )
 
                 if len(history) < self.min_history_points:

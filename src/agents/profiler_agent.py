@@ -118,7 +118,7 @@ class ProfilerAgent(BaseAgent):
         self.validation_rules = self.validation_rule_loader.reload_rules()
         logger.info(f"Reloaded {len(self.validation_rules)} validation rules from configuration")
         
-    def execute(self, dataset_path: str, **kwargs) -> ProfileResults:
+    def execute(self, dataset_path: str, dataset_name: Optional[str] = None, **kwargs) -> ProfileResults:
         """
         Execute profiling on the given dataset with optimized processing for large datasets.
         
@@ -140,10 +140,10 @@ class ProfilerAgent(BaseAgent):
             if (self.enable_chunked_processing and 
                 file_size_mb > self.chunked_processing_threshold_mb):
                 logger.info(f"Using chunked processing for large dataset ({file_size_mb:.2f} MB)")
-                results = self._execute_chunked(dataset_path)
+                results = self._execute_chunked(dataset_path, dataset_name=dataset_name)
             else:
                 logger.info("Using standard processing for small dataset")
-                results = self._execute_standard(dataset_path)
+                results = self._execute_standard(dataset_path, dataset_name=dataset_name)
             
             # Store execution metadata
             execution_time = time.time() - start_time
@@ -178,7 +178,7 @@ class ProfilerAgent(BaseAgent):
             logger.error(f"Profiling failed: {str(e)}")
             raise
     
-    def _execute_standard(self, dataset_path: str) -> ProfileResults:
+    def _execute_standard(self, dataset_path: str, dataset_name: Optional[str] = None) -> ProfileResults:
         """Execute standard profiling for smaller datasets."""
         # Load dataset using FileHandler
         df = FileHandler.load_dataset(dataset_path)
@@ -189,7 +189,7 @@ class ProfilerAgent(BaseAgent):
             df = df.sample(n=self.sample_size, random_state=42)
         
         # Generate dataset profile
-        dataset_profile = self._profile_dataset(df, dataset_path)
+        dataset_profile = self._profile_dataset(df, dataset_path, dataset_name=dataset_name)
         
         # Detect issues
         issues = self._detect_issues(df, dataset_profile)
@@ -200,7 +200,7 @@ class ProfilerAgent(BaseAgent):
             execution_metadata={}
         )
     
-    def _execute_chunked(self, dataset_path: str) -> ProfileResults:
+    def _execute_chunked(self, dataset_path: str, dataset_name: Optional[str] = None) -> ProfileResults:
         """Execute chunked profiling for large datasets."""
         logger.info("Starting chunked processing")
         
@@ -273,7 +273,7 @@ class ProfilerAgent(BaseAgent):
         final_metrics = self._finalize_column_metrics(column_metrics_accumulator, total_rows)
         
         # Create dataset profile
-        dataset_profile = self._create_dataset_profile(final_metrics, total_rows, dataset_path)
+        dataset_profile = self._create_dataset_profile(final_metrics, total_rows, dataset_path, dataset_name=dataset_name)
         
         # Log final stats for verification
         logger.info(f"Final profile: {total_rows} rows, {dataset_profile.total_columns} columns")
@@ -289,7 +289,7 @@ class ProfilerAgent(BaseAgent):
             execution_metadata={}
         )
     
-    def _profile_dataset(self, df: pd.DataFrame, dataset_path: str) -> DatasetProfile:
+    def _profile_dataset(self, df: pd.DataFrame, dataset_path: str, dataset_name: Optional[str] = None) -> DatasetProfile:
         """Generate comprehensive dataset profile."""
         logger.info("Computing dataset profile metrics")
         
@@ -310,7 +310,7 @@ class ProfilerAgent(BaseAgent):
         data_size_mb = df.memory_usage(deep=True).sum() / 1024 / 1024
         
         return DatasetProfile(
-            dataset_name=Path(dataset_path).stem,
+            dataset_name=dataset_name or Path(dataset_path).stem,
             total_rows=len(df),
             total_columns=len(df.columns),
             profiling_timestamp=datetime.now(),
@@ -1051,7 +1051,7 @@ class ProfilerAgent(BaseAgent):
         
         return final_metrics
     
-    def _create_dataset_profile(self, column_metrics: Dict[str, ColumnMetrics], total_rows: int, dataset_path: str) -> DatasetProfile:
+    def _create_dataset_profile(self, column_metrics: Dict[str, ColumnMetrics], total_rows: int, dataset_path: str, dataset_name: Optional[str] = None) -> DatasetProfile:
         """Create dataset profile from finalized metrics."""
         # Calculate overall metrics from accumulated totals
         total_cells = sum(m.total_count for m in column_metrics.values() if m.total_count is not None)
@@ -1070,7 +1070,7 @@ class ProfilerAgent(BaseAgent):
         estimated_data_size_mb = (total_rows * len(column_metrics) * 50) / (1024 * 1024)  # Rough estimate: 50 bytes per cell
         
         return DatasetProfile(
-            dataset_name=Path(dataset_path).stem,
+            dataset_name=dataset_name or Path(dataset_path).stem,
             total_rows=total_rows,
             total_columns=len(column_metrics),
             profiling_timestamp=datetime.now(),

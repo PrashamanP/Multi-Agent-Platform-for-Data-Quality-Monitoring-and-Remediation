@@ -76,6 +76,7 @@ python scripts/run_pipeline.py \
 
 - For the full baseline dataset, point to the larger file (may take longer):  
   `python scripts/run_pipeline.py --dataset data/input/npidata_baseline.csv --output-file data/output/npidata_baseline_fixed.csv`
+- Anomaly detection compares runs with the same dataset name. Keep sample and baseline histories separate by using different filenames or pass `--dataset-name npidata_baseline` (or another stable name) when running the full dataset.
 
 ### Profiler demo
 ```bash

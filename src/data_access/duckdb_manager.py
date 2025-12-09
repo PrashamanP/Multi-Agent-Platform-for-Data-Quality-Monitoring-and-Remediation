@@ -379,6 +379,7 @@ class DuckDBManager:
         metric: str,
         limit: Optional[int] = None,
         exclude_run_id: Optional[str] = None,
+        before_timestamp: Optional[datetime] = None,
     ) -> List[Tuple[datetime, float, str]]:
         """
         Retrieve historical metric values for a column.
@@ -409,6 +410,9 @@ class DuckDBManager:
         if exclude_run_id:
             query += " AND c.run_id <> ?"
             params.append(exclude_run_id)
+        if before_timestamp:
+            query += " AND r.profiling_timestamp < ?"
+            params.append(before_timestamp)
 
         query += " ORDER BY r.profiling_timestamp ASC"
         if limit:
