@@ -188,7 +188,7 @@ class AnomalyDetectionAgent(BaseAgent):
                     continue
 
                 history = self.duckdb_manager.fetch_column_history(
-                    dataset_name=profile.dataset_name,
+                    dataset_name=None,
                     column_name=column_name,
                     metric=metric_name,
                     limit=self.max_history_points,

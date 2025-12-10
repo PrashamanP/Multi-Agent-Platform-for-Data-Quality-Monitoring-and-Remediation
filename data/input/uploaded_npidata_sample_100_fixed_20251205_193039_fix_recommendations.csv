@@ -1,0 +1,7 @@
+row_index,column,issue_type,original_value,recommended_value,strategy,confidence,reason
+3,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+20,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+35,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+52,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+87,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files
+89,Provider Business Mailing Address City Name,completeness,,,context_imputation,0.8,Inference failed - insufficient context or not found in reference files

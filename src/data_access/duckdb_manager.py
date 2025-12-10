@@ -374,52 +374,40 @@ class DuckDBManager:
 
     def fetch_column_history(
         self,
-        dataset_name: str,
+        dataset_name: Optional[str],  # ← Allow None
         column_name: str,
         metric: str,
-        limit: Optional[int] = None,
+        limit: int = 50,
         exclude_run_id: Optional[str] = None,
         before_timestamp: Optional[datetime] = None,
-    ) -> List[Tuple[datetime, float, str]]:
-        """
-        Retrieve historical metric values for a column.
-
-        Returns list of (profiling_timestamp, value, run_id)
-        sorted ascending by timestamp.
-        """
-        if metric not in {"completeness", "uniqueness", "conformity"}:
-            raise ValueError(f"Unsupported metric '{metric}'")
-
-        metric_column = {
-            "completeness": "completeness_score",
-            "uniqueness": "uniqueness_score",
-            "conformity": "conformity_score",
-        }[metric]
+    ) -> List[Tuple[str, float, datetime]]:
 
         query = f"""
-            SELECT r.profiling_timestamp, c.{metric_column}, c.run_id
-            FROM {self.column_metrics_table} AS c
-            JOIN {self.profiling_run_table} AS r
-              ON c.run_id = r.run_id
-            WHERE c.dataset_name = ?
-              AND c.column_name = ?
-              AND c.{metric_column} IS NOT NULL
+            SELECT cm.run_id, cm.{metric}_score, pr.profiling_timestamp
+            FROM {self.column_metrics_table} cm
+            JOIN {self.profiling_run_table} pr ON cm.run_id = pr.run_id
+            WHERE cm.column_name = ?
+              AND cm.{metric}_score IS NOT NULL
         """
+        params = [column_name]
 
-        params: List[Any] = [dataset_name, column_name]
+        # Only filter by dataset_name if provided
+        if dataset_name is not None:
+            query += " AND pr.dataset_name = ?"
+            params.append(dataset_name)
+
         if exclude_run_id:
-            query += " AND c.run_id <> ?"
+            query += " AND cm.run_id != ?"
             params.append(exclude_run_id)
+
         if before_timestamp:
-            query += " AND r.profiling_timestamp < ?"
+            query += " AND pr.profiling_timestamp < ?"
             params.append(before_timestamp)
 
-        query += " ORDER BY r.profiling_timestamp ASC"
-        if limit:
-            query += f" LIMIT {int(limit)}"
+        query += f" ORDER BY pr.profiling_timestamp DESC LIMIT {limit}"
 
-        results = self.conn.execute(query, params).fetchall()
-        return [(row[0], float(row[1]), row[2]) for row in results]
+        result = self.conn.execute(query, params).fetchall()
+        return result
 
     def fetch_latest_run_id(self, dataset_name: str) -> Optional[str]:
         """Fetch run_id of the most recent profiling run for a dataset."""

@@ -5,22 +5,14 @@ import pandas as pd
 import streamlit as st
 import streamlit.components.v1 as components
 
-# -------------------------------------------------------------------
-# PATH SETUP: make project root importable (so src/ and scripts/ work)
-# -------------------------------------------------------------------
+# Path setup for project imports
 ROOT_DIR = Path(__file__).resolve().parents[1]
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 
-# -------------------------------------------------------------------
-# HELPER FUNCTION: Switch to a specific tab
-# -------------------------------------------------------------------
 def switch_tab(tab_index: int):
-    """
-    Inject JavaScript to switch to a specific tab.
-    tab_index: 0-based index of the tab to switch to
-    """
+    """Switch to a specific tab using JavaScript injection."""
     js = f"""
     <script>
         var tabs = window.parent.document.querySelectorAll('button[data-baseweb="tab"]');
@@ -29,24 +21,20 @@ def switch_tab(tab_index: int):
         }}
     </script>
     """
-    components.html(js, height=0)
+    st.components.v1.html(js, height=0)
 
 
-# -------------------------------------------------------------------
-# PAGE CONFIG
-# -------------------------------------------------------------------
+# Page Configuration
 st.set_page_config(
     page_title="NPI Data Quality Management System",
     layout="wide",
 )
 
-# -------------------------------------------------------------------
-# GLOBAL STYLES (tabs, buttons, sliders, etc.)
-# -------------------------------------------------------------------
+# Global Styles
 st.markdown(
     """
 <style>
-/* Overall page background */
+/* Page background */
 [data-testid="stAppViewContainer"] {
     background-color: #f5f7fb;
 }
@@ -56,7 +44,7 @@ main.block-container {
     padding-top: 1.5rem;
 }
 
-/* Top title spacing */
+/* Title spacing */
 h1 {
     margin-bottom: 0.25rem;
 }
@@ -67,15 +55,13 @@ h1 {
     color: #4b5563;
 }
 
-/* ------------------------------------------------------------ */
-/* TAB BAR — blue themed, professional                          */
-/* ------------------------------------------------------------ */
+/* Tab bar styling */
 .stTabs [role="tablist"] {
     border-bottom: 1px solid #E5E7EB !important;
     gap: 1.75rem !important;
 }
 
-/* Individual tab label */
+/* Tab label */
 .stTabs [role="tab"] {
     font-size: 0.90rem !important;
     padding: 0.75rem 0.25rem !important;
@@ -85,20 +71,20 @@ h1 {
     background: transparent !important;
 }
 
-/* Hover state */
+/* Tab hover state */
 .stTabs [role="tab"]:hover {
     color: #0f65d4 !important;
     opacity: 0.9;
 }
 
-/* Active tab label */
+/* Active tab */
 .stTabs [role="tab"][aria-selected="true"] {
     color: #0f65d4 !important;
     font-weight: 600 !important;
     border-bottom: 3px solid #0f65d4 !important;
 }
 
-/* Remove Streamlit's default colored indicator */
+/* Tab highlight */
 .stTabs [data-baseweb="tab-highlight"] {
     background-color: transparent !important;
     border-bottom: 3px solid #0f65d4 !important;
@@ -110,9 +96,7 @@ h1 {
     box-shadow: none !important;
 }
 
-/* ------------------------------------------------------------ */
-/* CARDS / SECTIONS                                             */
-/* ------------------------------------------------------------ */
+/* Card styling */
 .section-card {
     background-color: #ffffff;
     border-radius: 8px;
@@ -132,7 +116,7 @@ h1 {
     color: #6B7280;
 }
 
-/* Nice labels for metadata */
+/* Metadata labels */
 .meta-label {
     font-size: 0.8rem;
     font-weight: 500;
@@ -146,14 +130,12 @@ h1 {
     color: #111827;
 }
 
-/* Primary button alignment wrapper */
+/* Button wrapper */
 .button-row {
     margin-top: 1rem;
 }
 
-/* ------------------------------------------------------------ */
-/* PRIMARY BUTTON — blue                                        */
-/* ------------------------------------------------------------ */
+/* Primary button */
 div.stButton > button:first-child {
     background-color: #1E6AFF !important;
     color: white !important;
@@ -166,27 +148,23 @@ div.stButton > button:first-child:hover {
     background-color: #1554cc !important;
 }
 
-/* ------------------------------------------------------------ */
-/* SLIDERS — clean, minimal design                              */
-/* ------------------------------------------------------------ */
-
-/* Hide the red current value display above slider */
+/* Hide slider value display */
 .stSlider [data-testid="stThumbValue"] {
     display: none !important;
 }
 
-/* Hide min/max tick labels below slider */
+/* Hide slider tick labels */
 .stSlider [data-testid="stTickBarMin"],
 .stSlider [data-testid="stTickBarMax"] {
     display: none !important;
 }
 
-/* Slider track (background) */
+/* Slider track */
 .stSlider > div > div > div > div {
     background: #e5e7eb !important;
 }
 
-/* Slider track (filled/active part) */
+/* Slider active track */
 .stSlider [data-testid="stSliderTrack"] > div:first-child {
     background: #0f65d4 !important;
 }
@@ -199,12 +177,12 @@ div.stButton > button:first-child:hover {
     height: 16px !important;
 }
 
-/* Slider thumb focus state */
+/* Slider thumb focus */
 .stSlider [data-testid="stSliderThumb"]:focus {
     box-shadow: 0 0 0 3px rgba(15, 101, 212, 0.25) !important;
 }
 
-/* Slider label styling */
+/* Slider label */
 .stSlider label {
     font-size: 0.875rem !important;
     font-weight: 500 !important;
@@ -212,9 +190,7 @@ div.stButton > button:first-child:hover {
     margin-bottom: 0.5rem !important;
 }
 
-/* ------------------------------------------------------------ */
-/* NUMBER INPUT — clean styling                                 */
-/* ------------------------------------------------------------ */
+/* Number input styling */
 .stNumberInput label {
     font-size: 0.875rem !important;
     font-weight: 500 !important;
@@ -232,9 +208,7 @@ div.stButton > button:first-child:hover {
     border-color: #0f65d4 !important;
 }
 
-/* ------------------------------------------------------------ */
-/* CHECKBOX — clean styling                                     */
-/* ------------------------------------------------------------ */
+/* Checkbox styling */
 .stCheckbox label {
     font-size: 0.875rem !important;
     color: #374151 !important;
@@ -253,9 +227,7 @@ div.stButton > button:first-child:hover {
     unsafe_allow_html=True,
 )
 
-# -------------------------------------------------------------------
-# HEADER
-# -------------------------------------------------------------------
+# Header
 st.markdown(
     """
 # NPI Data Quality Management System
@@ -267,9 +239,7 @@ Manage data profiling, anomaly detection, and remediation for NPI datasets.
 )
 
 
-# -------------------------------------------------------------------
-# TABS
-# -------------------------------------------------------------------
+# Tab Definitions
 tab_labels = [
     "Upload Data",
     "Profiling",
@@ -281,9 +251,9 @@ tab_labels = [
 tabs = st.tabs(tab_labels)
 
 
-# -------------------------------------------------------------------
-# TAB 1 — UPLOAD DATA
-# -------------------------------------------------------------------
+# =============================================================================
+# TAB 1: UPLOAD DATA
+# =============================================================================
 with tabs[0]:
     center = st.container()
     with center:
@@ -321,7 +291,7 @@ with tabs[0]:
                 st.markdown("**Dataset preview**")
                 st.dataframe(df_preview.head(20), use_container_width=True)
 
-                # Save to data/input so the back-end pipeline can consume it
+                # Save file for backend processing
                 input_dir = ROOT_DIR / "data" / "input"
                 input_dir.mkdir(parents=True, exist_ok=True)
                 saved_path = input_dir / f"uploaded_{uploaded_file.name}"
@@ -333,40 +303,32 @@ with tabs[0]:
                     elif suffix == ".parquet":
                         df_preview.to_parquet(saved_path, index=False)
                 except Exception as exc:
-                    st.warning(
-                        "File was loaded but could not be saved for the pipeline: "
-                        f"{exc}"
-                    )
+                    st.warning(f"File was loaded but could not be saved for the pipeline: {exc}")
                     saved_path = None
 
                 st.session_state["uploaded_dataset_path"] = (
                     str(saved_path) if saved_path is not None else None
                 )
 
-        # Start profiling button
+        # Navigation button
         st.markdown('<div class="button-row">', unsafe_allow_html=True)
         if st.button("Start Profiling", type="primary", key="start_profiling_btn"):
             dataset_path = st.session_state.get("uploaded_dataset_path")
             if not dataset_path:
                 st.warning("Please upload a dataset before starting profiling.")
             else:
-                st.session_state["navigate_to_tab"] = 1  # Profiling tab
-                st.rerun()
+                st.session_state["active_tab"] = 1
+                switch_tab(1)
         st.markdown("</div>", unsafe_allow_html=True)
 
-        # Handle navigation
-        if st.session_state.get("navigate_to_tab") == 1:
-            switch_tab(1)
-            st.session_state["navigate_to_tab"] = None
 
-
-# -------------------------------------------------------------------
-# TAB 2 — PROFILING
-# -------------------------------------------------------------------
+# =============================================================================
+# TAB 2: PROFILING
+# =============================================================================
 with tabs[1]:
     st.title("Data Profiling")
 
-    # Custom CSS for professional styling
+    # Profiling styles
     st.markdown(
         """
         <style>
@@ -404,6 +366,22 @@ with tabs[1]:
         .profile-metric-value.success { color: #065f46; }
         .profile-metric-value.warning { color: #92400e; }
         .profile-metric-value.danger { color: #991b1b; }
+        .quality-metric-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        .quality-metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+        }
+        .quality-metric-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
         .legend-container {
             display: flex;
             gap: 24px;
@@ -437,7 +415,7 @@ with tabs[1]:
         st.warning("Please upload a dataset in the Upload Data tab before running profiling.")
     else:
         st.markdown(
-            '<p class="profile-intro">Analyze the dataset for completeness and conformity issues. This identifies structural and rule-based problems used by downstream agents.</p>',
+            '<p class="profile-intro">Analyze the dataset for completeness, uniqueness, and conformity issues. This identifies structural and rule-based problems used by downstream agents.</p>',
             unsafe_allow_html=True,
         )
 
@@ -467,18 +445,15 @@ with tabs[1]:
             except Exception as e:
                 st.error(f"Profiling failed: {e}")
 
-        # Show results if they exist
+        # Display results
         if "profile_results" in st.session_state:
             results = st.session_state.profile_results
 
-            # Handle both direct profile object and nested structure
             profile = results.get("dataset_profile", results)
             issues = results.get("issues", [])
             column_profiles = results.get("column_profiles", {})
 
-            # ─────────────────────────────────────────────────────────────
             # Dataset Summary
-            # ─────────────────────────────────────────────────────────────
             st.markdown('<p class="profile-section-header">Dataset Summary</p>', unsafe_allow_html=True)
 
             total_rows = profile.get('total_rows', 0)
@@ -518,12 +493,96 @@ with tabs[1]:
                     unsafe_allow_html=True,
                 )
 
-            # ─────────────────────────────────────────────────────────────
+            # Overall Quality Metrics
+            st.markdown('<p class="profile-section-header">Overall Quality Metrics</p>', unsafe_allow_html=True)
+
+            overall_completeness = profile.get('overall_completeness', None)
+            overall_uniqueness = profile.get('overall_uniqueness', None)
+            overall_conformity = profile.get('overall_conformity', None)
+
+            if column_profiles:
+                completeness_scores = []
+                uniqueness_scores = []
+                conformity_scores = []
+
+                for col_name, metrics in column_profiles.items():
+                    if isinstance(metrics, dict):
+                        comp_val = metrics.get("completeness_score", metrics.get("completeness"))
+                        if comp_val is not None:
+                            if comp_val <= 1.0:
+                                comp_val = comp_val * 100.0
+                            completeness_scores.append(comp_val)
+
+                        uniq_val = metrics.get("uniqueness_score", metrics.get("uniqueness"))
+                        if uniq_val is not None:
+                            if uniq_val <= 1.0:
+                                uniq_val = uniq_val * 100.0
+                            uniqueness_scores.append(uniq_val)
+
+                        conf_val = metrics.get("conformity_score", metrics.get("conformity"))
+                        if conf_val is not None:
+                            if conf_val <= 1.0:
+                                conf_val = conf_val * 100.0
+                            conformity_scores.append(conf_val)
+
+                if overall_completeness is None and completeness_scores:
+                    overall_completeness = sum(completeness_scores) / len(completeness_scores)
+                if overall_uniqueness is None and uniqueness_scores:
+                    overall_uniqueness = sum(uniqueness_scores) / len(uniqueness_scores)
+                if overall_conformity is None and conformity_scores:
+                    overall_conformity = sum(conformity_scores) / len(conformity_scores)
+
+            overall_completeness = overall_completeness if overall_completeness is not None else 0.0
+            overall_uniqueness = overall_uniqueness if overall_uniqueness is not None else 100.0
+            overall_conformity = overall_conformity if overall_conformity is not None else 0.0
+
+            def get_quality_color(value):
+                if value >= 95:
+                    return "#065f46"
+                elif value >= 80:
+                    return "#92400e"
+                else:
+                    return "#991b1b"
+
+            comp_color = get_quality_color(overall_completeness)
+            uniq_color = get_quality_color(overall_uniqueness)
+            conf_color = get_quality_color(overall_conformity)
+
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.markdown(
+                    f"""
+                    <div class="quality-metric-card">
+                        <div class="quality-metric-value" style="color: {comp_color};">{overall_completeness:.1f}%</div>
+                        <div class="quality-metric-label">Avg. Completeness</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            with col2:
+                st.markdown(
+                    f"""
+                    <div class="quality-metric-card">
+                        <div class="quality-metric-value" style="color: {uniq_color};">{overall_uniqueness:.1f}%</div>
+                        <div class="quality-metric-label">Avg. Uniqueness</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+            with col3:
+                st.markdown(
+                    f"""
+                    <div class="quality-metric-card">
+                        <div class="quality-metric-value" style="color: {conf_color};">{overall_conformity:.1f}%</div>
+                        <div class="quality-metric-label">Avg. Conformity</div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
             # Column Details
-            # ─────────────────────────────────────────────────────────────
             st.markdown('<p class="profile-section-header">Column Details</p>', unsafe_allow_html=True)
 
-            # Compact legend
             st.markdown(
                 """
                 <div class="legend-container">
@@ -547,7 +606,6 @@ with tabs[1]:
             col_df = None
 
             def highlight_quality(val):
-                """Color code based on quality thresholds."""
                 if pd.isna(val) or val is None:
                     return "background-color: #f8fafc; color: #94a3b8"
                 elif val == 100.0:
@@ -557,7 +615,6 @@ with tabs[1]:
                 else:
                     return "background-color: #fee2e2; color: #991b1b"
 
-            # Dict format
             if column_profiles and isinstance(column_profiles, dict):
                 column_records = []
                 for column_name, metrics in column_profiles.items():
@@ -568,6 +625,12 @@ with tabs[1]:
                         else:
                             completeness_pct = completeness_val
 
+                        uniqueness_val = metrics.get("uniqueness_score", metrics.get("uniqueness"))
+                        if uniqueness_val is not None and uniqueness_val <= 1.0:
+                            uniqueness_pct = uniqueness_val * 100.0
+                        else:
+                            uniqueness_pct = uniqueness_val
+
                         conformity_val = metrics.get("conformity_score", metrics.get("conformity"))
                         if conformity_val is not None and conformity_val <= 1.0:
                             conformity_pct = conformity_val * 100.0
@@ -577,13 +640,13 @@ with tabs[1]:
                         column_records.append({
                             "Column Name": column_name,
                             "Completeness": completeness_pct,
+                            "Uniqueness": uniqueness_pct,
                             "Conformity": conformity_pct,
                         })
 
                 if column_records:
                     col_df = pd.DataFrame(column_records)
 
-            # List format fallback
             elif column_profiles and isinstance(column_profiles, list):
                 column_records = []
                 for cp in column_profiles:
@@ -595,6 +658,12 @@ with tabs[1]:
                     else:
                         completeness_pct = completeness_val
 
+                    uniqueness_val = cp.get("uniqueness_score", cp.get("uniqueness"))
+                    if uniqueness_val is not None and uniqueness_val <= 1.0:
+                        uniqueness_pct = uniqueness_val * 100.0
+                    else:
+                        uniqueness_pct = uniqueness_val
+
                     conformity_val = cp.get("conformity_score", cp.get("conformity"))
                     if conformity_val is not None and conformity_val <= 1.0:
                         conformity_pct = conformity_val * 100.0
@@ -604,6 +673,7 @@ with tabs[1]:
                     column_records.append({
                         "Column Name": name,
                         "Completeness": completeness_pct,
+                        "Uniqueness": uniqueness_pct,
                         "Conformity": conformity_pct,
                     })
 
@@ -613,19 +683,22 @@ with tabs[1]:
             if col_df is not None:
                 styled_df = (
                     col_df.style.applymap(
-                        highlight_quality, subset=["Completeness", "Conformity"]
+                        highlight_quality, subset=["Completeness", "Uniqueness", "Conformity"]
                     )
                     .format({
                         "Completeness": lambda x: f"{x:.1f}%" if pd.notna(x) else "N/A",
+                        "Uniqueness": lambda x: f"{x:.1f}%" if pd.notna(x) else "N/A",
                         "Conformity": lambda x: f"{x:.1f}%" if pd.notna(x) else "N/A",
                     })
                 )
 
                 st.dataframe(styled_df, use_container_width=True, hide_index=True)
 
-                # Download button
                 download_df = col_df.copy()
                 download_df["Completeness"] = download_df["Completeness"].apply(
+                    lambda x: f"{x:.1f}%" if pd.notna(x) else "N/A"
+                )
+                download_df["Uniqueness"] = download_df["Uniqueness"].apply(
                     lambda x: f"{x:.1f}%" if pd.notna(x) else "N/A"
                 )
                 download_df["Conformity"] = download_df["Conformity"].apply(
@@ -641,15 +714,12 @@ with tabs[1]:
             else:
                 st.info("No column-level details were returned from the profiler.")
 
-            # ─────────────────────────────────────────────────────────────
             # Issues
-            # ─────────────────────────────────────────────────────────────
             if issues:
                 st.markdown('<p class="profile-section-header">Issues</p>', unsafe_allow_html=True)
 
                 issues_df = pd.DataFrame(issues)
 
-                # Select and rename relevant columns if they exist
                 display_columns = []
                 column_mapping = {}
 
@@ -670,13 +740,11 @@ with tabs[1]:
                     display_df = issues_df[display_columns].copy()
                     display_df = display_df.rename(columns=column_mapping)
 
-                    # Format percentage
                     if "Percentage" in display_df.columns:
                         display_df["Percentage"] = display_df["Percentage"].apply(
                             lambda x: f"{x:.1f}%" if pd.notna(x) else "N/A"
                         )
 
-                    # Format issue type
                     if "Issue Type" in display_df.columns:
                         display_df["Issue Type"] = display_df["Issue Type"].str.title()
 
@@ -685,7 +753,6 @@ with tabs[1]:
                     if len(issues_df) > 20:
                         st.caption(f"Showing 20 of {len(issues_df)} issues")
 
-                    # Download all issues
                     csv = issues_df.to_csv(index=False).encode("utf-8")
                     st.download_button(
                         label="Download All Issues",
@@ -698,42 +765,105 @@ with tabs[1]:
             else:
                 st.info("No issues were found during profiling.")
 
-            # ─────────────────────────────────────────────────────────────
-            # Next Button
-            # ─────────────────────────────────────────────────────────────
+            # Navigation
             st.markdown("---")
             col1, col2, col3 = st.columns([2, 1, 1])
             with col3:
                 if st.button("Next: Anomaly Detection", type="primary", key="profiling_next_btn"):
-                    st.session_state["navigate_to_tab"] = 2
-                    st.rerun()
-
-            # Handle navigation
-            if st.session_state.get("navigate_to_tab") == 2:
-                switch_tab(2)
-                st.session_state["navigate_to_tab"] = None
+                    st.session_state["active_tab"] = 2
+                    switch_tab(2)
 
 
-# -------------------------------------------------------------------
-# TAB 3 — ANOMALY DETECTION
-# -------------------------------------------------------------------
+# =============================================================================
+# TAB 3: ANOMALY DETECTION
+# =============================================================================
 with tabs[2]:
     st.title("Anomaly Detection")
 
+    # Anomaly styles
     st.markdown(
         """
-        <p style="color: #64748b; font-size: 0.95rem; margin-bottom: 24px;">
-        Compare the current profiling run against historical baselines to detect statistical anomalies and distribution shifts.
-        </p>
+        <style>
+        .anomaly-intro {
+            color: #64748b;
+            font-size: 0.95rem;
+            margin-bottom: 24px;
+        }
+        .anomaly-section-header {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 16px;
+            margin-top: 24px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .baseline-info-card {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-left: 4px solid #0284c7;
+            border-radius: 4px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .baseline-info-title {
+            font-weight: 600;
+            color: #0c4a6e;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+        }
+        .baseline-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 12px;
+        }
+        .baseline-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .baseline-info-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .baseline-info-value {
+            font-size: 0.95rem;
+            color: #1e293b;
+            font-weight: 500;
+        }
+        .anomaly-metric-card {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+        }
+        .anomaly-metric-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #1e3a5f;
+        }
+        .anomaly-metric-label {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 4px;
+        }
+        </style>
         """,
+        unsafe_allow_html=True,
+    )
+
+    st.markdown(
+        '<p class="anomaly-intro">Compare the current profiling run against historical baselines to detect statistical anomalies and distribution shifts.</p>',
         unsafe_allow_html=True,
     )
 
     if "profile_results" not in st.session_state:
         st.warning("Please run profiling first before detecting anomalies.")
     else:
-        # Configuration section
-        st.markdown("### Detection Settings")
+        # Detection Settings
+        st.markdown('<p class="anomaly-section-header">Detection Settings</p>', unsafe_allow_html=True)
 
         col1, col2, col3 = st.columns(3)
 
@@ -774,7 +904,6 @@ with tabs[2]:
 
         st.markdown("---")
 
-        # Run anomaly detection button
         run_anomaly_clicked = st.button("Run Anomaly Detection", type="primary", key="run_anomaly_btn")
 
         if run_anomaly_clicked:
@@ -800,6 +929,13 @@ with tabs[2]:
                         results = response.json()
                         st.session_state.anomaly_results = results
 
+                        st.session_state.anomaly_settings = {
+                            "min_history_points": min_history,
+                            "delta_threshold": delta_threshold,
+                            "zscore_threshold": zscore_threshold,
+                            "flag_only_degradations": flag_degradations_only,
+                        }
+
                         if results.get("status") == "skipped":
                             st.warning(results.get("message"))
                         elif results.get("status") == "error":
@@ -810,75 +946,277 @@ with tabs[2]:
                         st.error(f"Anomaly detection failed: {response.status_code}")
 
             except requests.exceptions.ConnectionError:
-                st.error("Could not connect to backend. Make sure your FastAPI server is running on http://localhost:8000")
+                st.error("Could not connect to backend. Ensure FastAPI server is running on http://localhost:8000")
             except Exception as e:
                 st.error(f"Anomaly detection failed: {e}")
 
-        # Display results if available
+        # Display results
         if "anomaly_results" in st.session_state:
             results = st.session_state.anomaly_results
+            anomaly_settings = st.session_state.get("anomaly_settings", {})
 
             if results.get("status") == "skipped":
                 st.info("Anomaly detection was skipped. You need at least 3 historical runs in DuckDB.")
             else:
                 anomalies = results.get("anomalies", [])
+                execution_metadata = results.get("execution_metadata", {})
+
+                # Baseline Information
+                st.markdown('<p class="anomaly-section-header">Baseline Information</p>', unsafe_allow_html=True)
+
+                dataset_name = results.get("dataset_name", execution_metadata.get("dataset_name", "N/A"))
+                run_id = results.get("run_id", execution_metadata.get("run_id", "N/A"))
+
+                history_sizes = []
+                columns_with_anomalies = set()
+
+                for anomaly in anomalies:
+                    context = anomaly.get("context", {})
+                    if "history_size" in context:
+                        history_sizes.append(context["history_size"])
+                    if "column_name" in anomaly:
+                        columns_with_anomalies.add(anomaly["column_name"])
+
+                if history_sizes:
+                    avg_history = sum(history_sizes) / len(history_sizes)
+                    min_history_used = min(history_sizes)
+                    max_history_used = max(history_sizes)
+                else:
+                    avg_history = anomaly_settings.get("min_history_points", 3)
+                    min_history_used = anomaly_settings.get("min_history_points", 3)
+                    max_history_used = anomaly_settings.get("min_history_points", 3)
+
+                timestamp = execution_metadata.get("timestamp", "N/A")
+                if timestamp == "N/A":
+                    from datetime import datetime
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M")
+
+                display_run_id = str(run_id)[:12] + "..." if len(str(run_id)) > 12 else str(run_id)
+
+                st.markdown(
+                    f"""
+                    <div class="baseline-info-card">
+                        <div class="baseline-info-title">Comparison Baseline Details</div>
+                        <div class="baseline-info-grid">
+                            <div class="baseline-info-item">
+                                <span class="baseline-info-label">Current Run ID</span>
+                                <span class="baseline-info-value">{display_run_id}</span>
+                            </div>
+                            <div class="baseline-info-item">
+                                <span class="baseline-info-label">Dataset</span>
+                                <span class="baseline-info-value">{dataset_name}</span>
+                            </div>
+                            <div class="baseline-info-item">
+                                <span class="baseline-info-label">Avg. History Points</span>
+                                <span class="baseline-info-value">{avg_history:.0f} runs</span>
+                            </div>
+                            <div class="baseline-info-item">
+                                <span class="baseline-info-label">Run Timestamp</span>
+                                <span class="baseline-info-value">{timestamp}</span>
+                            </div>
+                        </div>
+                    </div>
+                    """,
+                    unsafe_allow_html=True,
+                )
+
+                with st.expander("View Detection Parameters"):
+                    col1, col2 = st.columns(2)
+
+                    with col1:
+                        st.markdown("**Detection Settings Used:**")
+                        st.markdown(f"- Min History Points: {anomaly_settings.get('min_history_points', 'N/A')}")
+                        st.markdown(f"- Delta Threshold: {anomaly_settings.get('delta_threshold', 'N/A')}%")
+                        st.markdown(f"- Z-Score Threshold: {anomaly_settings.get('zscore_threshold', 'N/A')}")
+                        st.markdown(f"- Degradations Only: {anomaly_settings.get('flag_only_degradations', 'N/A')}")
+
+                    with col2:
+                        st.markdown("**Baseline Statistics:**")
+                        st.markdown(f"- Columns with Anomalies: {len(columns_with_anomalies)}")
+                        if history_sizes:
+                            st.markdown(f"- Min History Used: {min_history_used} runs")
+                            st.markdown(f"- Max History Used: {max_history_used} runs")
+                            st.markdown(f"- Avg History Used: {avg_history:.1f} runs")
+                        exec_time = execution_metadata.get("execution_time_seconds", 0)
+                        if exec_time:
+                            st.markdown(f"- Execution Time: {exec_time:.2f}s")
 
                 # Detection Summary
-                st.markdown("### Detection Summary")
+                st.markdown('<p class="anomaly-section-header">Detection Summary</p>', unsafe_allow_html=True)
 
-                cols = st.columns(4)
-                cols[0].metric("Total Anomalies", len(anomalies))
-
+                total_anomalies = len(anomalies)
                 high_count = sum(1 for a in anomalies if a.get("severity") == "high")
                 medium_count = sum(1 for a in anomalies if a.get("severity") == "medium")
                 low_count = sum(1 for a in anomalies if a.get("severity") == "low")
 
-                cols[1].metric("High Severity", high_count)
-                cols[2].metric("Medium Severity", medium_count)
-                cols[3].metric("Low Severity", low_count)
+                def get_severity_color(count, is_total=False):
+                    if is_total:
+                        if count == 0:
+                            return "#065f46"
+                        elif count < 10:
+                            return "#92400e"
+                        else:
+                            return "#991b1b"
+                    return "#1e3a5f"
 
-                # Anomalies table
+                total_color = get_severity_color(total_anomalies, is_total=True)
+                high_color = "#991b1b" if high_count > 0 else "#065f46"
+                medium_color = "#92400e" if medium_count > 0 else "#065f46"
+                low_color = "#64748b"
+
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.markdown(
+                        f"""
+                        <div class="anomaly-metric-card">
+                            <div class="anomaly-metric-value" style="color: {total_color};">{total_anomalies}</div>
+                            <div class="anomaly-metric-label">Total Anomalies</div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+                with col2:
+                    st.markdown(
+                        f"""
+                        <div class="anomaly-metric-card">
+                            <div class="anomaly-metric-value" style="color: {high_color};">{high_count}</div>
+                            <div class="anomaly-metric-label">High Severity</div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+                with col3:
+                    st.markdown(
+                        f"""
+                        <div class="anomaly-metric-card">
+                            <div class="anomaly-metric-value" style="color: {medium_color};">{medium_count}</div>
+                            <div class="anomaly-metric-label">Medium Severity</div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+                with col4:
+                    st.markdown(
+                        f"""
+                        <div class="anomaly-metric-card">
+                            <div class="anomaly-metric-value" style="color: {low_color};">{low_count}</div>
+                            <div class="anomaly-metric-label">Low Severity</div>
+                        </div>
+                        """,
+                        unsafe_allow_html=True,
+                    )
+
+                # Detected Anomalies Table
                 if anomalies:
-                    st.markdown("### Detected Anomalies")
+                    st.markdown('<p class="anomaly-section-header">Detected Anomalies</p>', unsafe_allow_html=True)
 
                     anomaly_records = []
                     for anomaly in anomalies:
+                        z_score_val = anomaly.get('z_score', 0)
+                        if z_score_val >= 999 or z_score_val == float('inf'):
+                            z_score_display = "-"
+                        else:
+                            z_score_display = f"{z_score_val:.2f}"
+
                         anomaly_records.append({
                             "Column": anomaly.get("column_name", "N/A"),
                             "Metric": anomaly.get("metric", "N/A"),
-                            "Current Value": f"{anomaly.get('current_value', 0):.2f}%",
-                            "Baseline": f"{anomaly.get('baseline_value', 0):.2f}%",
-                            "Delta": f"{anomaly.get('delta', 0):.2f}%",
-                            "Z-Score": f"{anomaly.get('z_score', 0):.2f}",
+                            "Current": f"{anomaly.get('current_value', 0):.1f}%",
+                            "Baseline": f"{anomaly.get('baseline_value', 0):.1f}%",
+                            "Delta": f"{anomaly.get('delta', 0):+.1f}%",
+                            "Z-Score": z_score_display,
                             "Severity": anomaly.get("severity", "unknown").upper(),
                         })
 
                     anomaly_df = pd.DataFrame(anomaly_records)
-                    st.dataframe(anomaly_df, use_container_width=True, hide_index=True)
+
+                    def highlight_severity(row):
+                        severity = row["Severity"].lower()
+                        if severity == "high":
+                            return ["background-color: #fee2e2"] * len(row)
+                        elif severity == "medium":
+                            return ["background-color: #fef3c7"] * len(row)
+                        elif severity == "low":
+                            return ["background-color: #f0f9ff"] * len(row)
+                        return [""] * len(row)
+
+                    styled_anomaly_df = anomaly_df.style.apply(highlight_severity, axis=1)
+
+                    st.dataframe(styled_anomaly_df, use_container_width=True, hide_index=True)
+
+                    csv = anomaly_df.to_csv(index=False).encode("utf-8")
+                    st.download_button(
+                        label="Download Anomalies",
+                        data=csv,
+                        file_name="anomalies.csv",
+                        mime="text/csv",
+                    )
+
+                    # Anomaly Visualization
+                    st.markdown('<p class="anomaly-section-header">Anomaly Visualization</p>', unsafe_allow_html=True)
+
+                    sorted_anomalies = sorted(anomalies, key=lambda x: abs(x.get("delta", 0)), reverse=True)[:5]
+
+                    line_data = {"Metric": ["Baseline", "Current"]}
+
+                    for anomaly in sorted_anomalies:
+                        column_name = anomaly.get("column_name", "N/A")
+                        metric = anomaly.get("metric", "N/A")
+                        short_name = column_name[:15] + "..." if len(column_name) > 15 else column_name
+                        label = f"{short_name} ({metric[:4]})"
+
+                        line_data[label] = [
+                            anomaly.get("baseline_value", 0),
+                            anomaly.get("current_value", 0),
+                        ]
+
+                    line_df = pd.DataFrame(line_data)
+                    line_df = line_df.set_index("Metric")
+
+                    st.markdown("**Top 5 Anomalies: Baseline → Current**")
+                    st.line_chart(line_df, height=400)
+                    st.caption("Each line shows how a metric changed from Baseline (left) to Current (right). Downward slopes indicate quality degradation.")
+
+                    st.markdown("---")
+
+                    st.markdown("**Quality Score Changes (Top 5)**")
+
+                    cols = st.columns(5)
+                    for i, anomaly in enumerate(sorted_anomalies):
+                        with cols[i]:
+                            column_name = anomaly.get("column_name", "N/A")
+                            metric = anomaly.get("metric", "N/A")
+                            short_name = column_name[:12] + "..." if len(column_name) > 12 else column_name
+
+                            delta_val = anomaly.get("delta", 0)
+                            delta_color = "inverse" if delta_val < 0 else "normal"
+
+                            st.metric(
+                                label=f"{short_name}",
+                                value=f"{anomaly.get('current_value', 0):.1f}%",
+                                delta=f"{delta_val:+.1f}%",
+                                delta_color=delta_color,
+                                help=f"{column_name} ({metric})"
+                            )
                 else:
                     st.success("No anomalies detected. Your data quality is consistent with historical baselines.")
 
-        # Next button
+        # Navigation
         st.markdown("---")
         col1, col2, col3 = st.columns([2, 1, 1])
         with col3:
             if st.button("Next: Recommendations", type="primary", key="anomaly_next_btn"):
-                st.session_state["navigate_to_tab"] = 3
-                st.rerun()
-
-        # Handle navigation
-        if st.session_state.get("navigate_to_tab") == 3:
-            switch_tab(3)
-            st.session_state["navigate_to_tab"] = None
+                st.session_state["active_tab"] = 3
+                switch_tab(3)
 
 
-# -------------------------------------------------------------------
-# TAB 4 — RECOMMENDATIONS
-# -------------------------------------------------------------------
+# =============================================================================
+# TAB 4: RECOMMENDATIONS
+# =============================================================================
 with tabs[3]:
     st.title("Fix Recommendations")
 
-    # Custom CSS
+    # Recommendations styles
     st.markdown(
         """
         <style>
@@ -970,7 +1308,6 @@ with tabs[3]:
     if "profile_results" not in st.session_state:
         st.warning("Please run profiling first before generating recommendations.")
     else:
-        # Generate button
         generate_clicked = st.button("Generate Recommendations", type="primary", use_container_width=True, key="gen_rec_btn")
 
         if generate_clicked:
@@ -1011,7 +1348,6 @@ with tabs[3]:
             if recommendations:
                 st.markdown("---")
 
-                # Statistics row
                 total_recs = len(recommendations)
                 auto_fixable = sum(1 for r in recommendations if r.get("actionable", False))
                 manual_review = total_recs - auto_fixable
@@ -1059,7 +1395,6 @@ with tabs[3]:
                         key="rec_actionable_filter"
                     )
 
-                # Apply filters
                 filtered_recs = [
                     r for r in recommendations
                     if r.get("estimated_impact") in impact_filter
@@ -1124,27 +1459,22 @@ with tabs[3]:
                         unsafe_allow_html=True,
                     )
 
-                # Next button
+                # Navigation
                 st.markdown("---")
                 col1, col2, col3 = st.columns([2, 1, 1])
                 with col3:
                     if st.button("Next: Execute Fixes", type="primary", key="rec_next_btn"):
-                        st.session_state["navigate_to_tab"] = 4
-                        st.rerun()
-
-                # Handle navigation
-                if st.session_state.get("navigate_to_tab") == 4:
-                    switch_tab(4)
-                    st.session_state["navigate_to_tab"] = None
+                        st.session_state["active_tab"] = 4
+                        switch_tab(4)
 
 
-# -------------------------------------------------------------------
-# TAB 5 — EXECUTE FIXES
-# -------------------------------------------------------------------
+# =============================================================================
+# TAB 5: EXECUTE FIXES
+# =============================================================================
 with tabs[4]:
     st.title("Execute Fixes")
 
-    # Custom CSS
+    # Execute fixes styles
     st.markdown(
         """
         <style>
@@ -1390,22 +1720,18 @@ with tabs[4]:
                     except Exception as e:
                         st.error(f"Unable to prepare download: {e}")
 
-                # Next button to Executive Summary
+                # Navigation
                 st.markdown("---")
                 col1, col2, col3 = st.columns([2, 1, 1])
                 with col3:
                     if st.button("Next: Executive Summary", type="primary", key="exec_next_btn"):
-                        st.session_state["navigate_to_tab"] = 5
-                        st.rerun()
-
-                if st.session_state.get("navigate_to_tab") == 5:
-                    switch_tab(5)
-                    st.session_state["navigate_to_tab"] = None
+                        st.session_state["active_tab"] = 5
+                        switch_tab(5)
 
 
-# -------------------------------------------------------------------
-# TAB 6 — EXECUTIVE SUMMARY
-# -------------------------------------------------------------------
+# =============================================================================
+# TAB 6: EXECUTIVE SUMMARY
+# =============================================================================
 with tabs[5]:
     st.title("Executive Summary")
 
@@ -1482,7 +1808,6 @@ with tabs[5]:
         issues = profile_results.get("issues", [])
         column_profiles = profile_results.get("column_profiles", {})
 
-        # Get dataset info
         dataset_name = dataset_profile.get("dataset_name") or profile_results.get("dataset_name") or "Unknown"
         row_count = dataset_profile.get("total_rows") or profile_results.get("total_rows") or 0
         column_count = dataset_profile.get("total_columns") or profile_results.get("total_columns") or len(column_profiles) or 0
