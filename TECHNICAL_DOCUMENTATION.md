@@ -13,12 +13,13 @@
 2. [Data Quality Issue Types](#data-quality-issue-types)
 3. [Validation Rules](#validation-rules)
 4. [Profiler Agent](#profiler-agent)
-5. [Fix Recommendation Agent](#fix-recommendation-agent)
-6. [Fix Executor Agent](#fix-executor-agent)
-7. [Special Column Handling](#special-column-handling)
-8. [Edge Cases and Special Logic](#edge-cases-and-special-logic)
-9. [Reference Files](#reference-files)
-10. [Configuration](#configuration)
+5. [Validator Agent](#validator-agent)
+6. [Fix Recommendation Agent](#fix-recommendation-agent)
+7. [Fix Executor Agent](#fix-executor-agent)
+8. [Special Column Handling](#special-column-handling)
+9. [Edge Cases and Special Logic](#edge-cases-and-special-logic)
+10. [Reference Files](#reference-files)
+11. [Configuration](#configuration)
 
 ---
 
@@ -196,6 +197,38 @@ not_future: true/false
 
 Identifies and quantifies data quality issues in the dataset.
 
+### Responsibilities and Scope
+
+- Computes core data quality metrics at dataset and column level:
+  - Completeness (percentage of non-null values, with conditional logic)
+  - Conformity (percentage of values matching the validation rules)
+  - Uniqueness (currently scoped to NPI, where uniqueness is required)
+- Applies NPI-specific business rules for conditional completeness:
+  - Universal required: `NPI`, `Entity Type Code`
+  - Conditional required:
+    - Entity Type Code = 1 (Individual): requires Provider Last Name + Provider First Name
+    - Entity Type Code = 2 (Organization): requires Provider Organization Name
+- Delegates all format/conformity checks to the `ValidatorAgent`
+  - ProfilerAgent is now the orchestrator that uses ValidatorAgent for rule evaluation
+  - ProfilerAgent focuses on metrics, issue detection, and persistence
+
+### Inputs and Outputs
+
+- **Input**: Path to a CSV dataset (typically NPI data)
+- **Output**: `ProfileResults` object containing:
+  - `DatasetProfile`
+    - `dataset_name` (from file stem)
+    - `total_rows`, `total_columns`
+    - `overall_completeness`, `overall_conformity`, `overall_uniqueness`
+    - `column_metrics`: per-column `ColumnMetrics`
+  - `issues`: list of `Issue` objects for:
+    - completeness violations
+    - conformity violations
+    - uniqueness violations (NPI duplicates)
+  - `execution_metadata`:
+    - runtime, processing mode (standard vs chunked), chunk size
+    - number of rules applied, run identifier, file size, timestamp
+
 ### Processing Modes
 
 #### Standard Mode
@@ -267,6 +300,101 @@ Identifies and quantifies data quality issues in the dataset.
 - **Issues List**: All detected data quality issues
 
 ---
+
+## Validator Agent
+
+### Purpose
+
+Provides a reusable, high-performance validation layer for checking data conformity against the configured validation rules.
+
+The ValidatorAgent is responsible for:
+- Loading and managing validation rules
+- Validating individual values for a specific column
+- Validating entire columns (`pd.Series`) for conformity
+- Running bulk validation over full datasets (CSV files), with the same scalable processing model as ProfilerAgent
+
+### Responsibilities and Separation of Concerns
+
+- **ValidatorAgent**
+  - Owns the implementation of all rule types (regex, enum, length, numeric, date, phone, etc.)
+  - Encapsulates null detection (via `is_value_null_for_completeness`) so that “null-like” business values are handled consistently
+  - Provides both row-wise and vectorized validation paths for performance
+  - Can be used independently (e.g., from scripts or tests) without profiling
+
+- **ProfilerAgent**
+  - Uses ValidatorAgent to compute conformity metrics as part of full profiling
+  - Focuses on aggregating metrics, computing derived scores, and detecting issues
+  - Does not re-implement validation rules; all rule logic lives in ValidatorAgent
+
+This separation allows you to:
+- Reuse validation logic across agents and tools
+- Evolve rules without changing profiling logic
+- Benchmark and tune validation performance independently
+
+### Inputs and Execution Modes
+
+The ValidatorAgent supports two primary usage patterns:
+
+1. **Series-level validation**
+   - Input: `pd.Series` and a column name (`column`)
+   - Typical method: `execute(series, column="NPI")` or `check_conformity(series, "NPI")`
+   - Returns: counts of conforming/non-conforming values, conformity score, and sample violations
+
+2. **Bulk dataset validation**
+   - Input: path to a CSV dataset (string)
+   - Method: `execute("data/input/npidata_sample_100.csv")`
+   - Returns a dictionary with:
+     - `column_results`: per-column metrics (total/non-null/null counts, conformity %, violations, rule info)
+     - `overall_stats`: dataset-wide averages and totals
+     - `execution_metadata`: runtime, processing mode, file size, rules applied, etc.
+
+### Rule Types and Logic
+
+ValidatorAgent is the reference implementation for rule evaluation. It supports:
+
+- **Regex rules**
+  - Applies compiled patterns to stringified values
+  - Used for fixed-format fields (NPI, EIN, postal codes, taxonomy codes, etc.)
+
+- **Enum rules**
+  - Enforces membership in a configured set of values
+  - Special handling for `Entity Type Code` (e.g., `"1.0"` → `"1"` when appropriate)
+
+- **Length rules**
+  - Enforces minimum/maximum string length (e.g., names, addresses)
+  - Uses vectorized operations for performance where possible
+
+- **Numeric rules**
+  - Requires values to parse as numeric
+
+- **Date rules**
+  - Supports multiple input formats
+  - Optional `not_future` constraint to reject future dates
+
+- **Phone rules**
+  - Strips non-digits and validates digit count range
+
+For any column without a configured rule:
+- Non-null values are treated as conforming from a *conformity* perspective
+- Completeness (i.e., null counts) is handled by ProfilerAgent, not ValidatorAgent
+
+### Null Handling and Violations
+
+- Uses shared helpers (`is_value_null_for_completeness`, `count_non_null_values`) to maintain consistent null semantics across agents.
+- Skips null-equivalent values when computing conformity (they impact completeness, not format conformity).
+- Collects a limited number of sample violations per column (configurable via `max_violation_examples`) for downstream analysis and fix recommendations.
+
+### Performance and Scalability
+
+ValidatorAgent mirrors the performance features of ProfilerAgent:
+- Chunked processing for large files (configurable chunk size and threshold)
+- Optional parallel column validation via `ThreadPoolExecutor`
+- Data type optimization for memory-efficient validation
+- Progress tracking for long-running validations
+
+ValidatorAgent can be:
+- Used standalone from scripts (e.g., `scripts/demo_validator.py`, `scripts/test_agents.py`)
+- Composed into agents like ProfilerAgent to provide a consistent validation foundation
 
 ## Fix Recommendation Agent
 
@@ -1028,4 +1156,3 @@ The system is designed to handle real-world data quality issues while preserving
 ---
 
 **End of Documentation**
-

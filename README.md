@@ -6,6 +6,11 @@ A multi-agent system designed to analyze National Provider Identifier (NPI) data
 
 The Profiler Agent is responsible for comprehensive data quality profiling of NPI datasets. It computes three primary data quality dimensions: completeness, conformity and uniqueness.
 
+Internally, the ProfilerAgent delegates all format and rule evaluation to the ValidatorAgent (see below) and focuses on:
+- Aggregating metrics at column and dataset level
+- Applying NPI-specific business logic for conditional completeness
+- Detecting issues (completeness, conformity, uniqueness) for downstream agents
+
 ### Data Quality Metrics
 
 #### 1. Completeness Score
@@ -47,6 +52,32 @@ The ProfilerAgent implements sophisticated business rules for NPI data:
 #### Optimization Settings
 - **Parallel Processing**: Multi-threaded column analysis
 - **Data Type Optimization**: Automatic dtype optimization for memory efficiency
+
+## Validator Agent
+
+The Validator Agent is a reusable validation engine that evaluates values and columns against the configured validation rules. It is used both by the ProfilerAgent and directly in scripts and tests.
+
+### Responsibilities
+- Load and manage validation rules from configuration
+- Validate individual values for a specific column (`validate_value`)
+- Validate whole columns / series (`check_conformity`, `check_conformity_vectorized`)
+- Run bulk validation on full CSV datasets (`execute` with a file path)
+
+### Behavior
+- Supports all rule types described in the technical documentation:
+  - Regex, enum, length, numeric, date, and phone rules
+- Shares the same null detection logic as the profiler so “null-like” business values are treated consistently
+- For columns without a rule, treats all non-null values as conforming (completeness is handled by the ProfilerAgent)
+- Provides both row-wise and vectorized validation paths for performance
+
+### Usage Examples
+- Series-level validation:
+  - `validator = ValidatorAgent()`
+  - `conforming, non_conforming, violations = validator.check_conformity(df["NPI"], "NPI")`
+- Bulk dataset validation:
+  - `validator = ValidatorAgent()`
+  - `results = validator.execute("data/input/npidata_sample_100.csv")`
+  - Inspect `results["column_results"]` for per-column conformity metrics
 
 ## Installation and Setup
 
